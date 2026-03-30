@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
+import { CARDWIDTH } from './config';
 
-const cardBaseSize = 240 / 4;
+const cardBaseSize = CARDWIDTH;
 
 const borderColors = {
   fate: 0x663300,

@@ -1,11 +1,12 @@
 import * as PIXI from 'pixi.js';
 import { Slot } from './slot';
+import { BASEUNIT, CARDHEIGHT, WIDTH } from './config';
 
 /**
  * Represents the visual layout of piles on screen
  */
 class Table {
-  constructor({ app, textures }) {
+  constructor({ app, textures, house }) {
     this.slots = {}; // { slotId: Slot }
     this.textures = textures;
 
@@ -13,6 +14,7 @@ class Table {
     this.container = new PIXI.Container();
     this.container.x = 0;
     this.container.y = 0;
+    this.house = house;
 
     app.stage.addChild(this.container);
   }
@@ -27,7 +29,8 @@ class Table {
    * @param {number} params.height
    * @param {'fan'|'singles'} params.layout
    */
-  addSlot({ id, x, y, width, height, layout = 'fan', pile }) {
+  addSlot({ id, x, y, width, height, layout = 'fan', pile, rotate = false, reverse = false }) {
+    console.log(id);
     const slot = new Slot({
       id,
       x,
@@ -38,6 +41,8 @@ class Table {
       parentContainer: this.container,
       textures: this.textures,
       pile,
+      rotate,
+      reverse,
     });
 
     this.slots[id] = slot;
@@ -52,6 +57,94 @@ class Table {
     const slot = this.getSlot(slotId);
     if (!slot) return;
     slot.setPile(pile);
+  }
+
+  constructTable() {
+    const topAreaHeight = CARDHEIGHT * 2 + BASEUNIT;
+    const centerColumnWidth = Math.floor((WIDTH - (6 * BASEUNIT + 2 * CARDHEIGHT)) / BASEUNIT) * BASEUNIT;
+    const centerColumnLeftSide = CARDHEIGHT + 3 * BASEUNIT;
+
+    this.addSlot({
+      id: 'wrath',
+      pile: this.house.piles.wrath,
+      x: centerColumnLeftSide,
+      y: BASEUNIT,
+      width: centerColumnWidth,
+      height: CARDHEIGHT,
+    });
+
+    this.addSlot({
+      id: 'combat',
+      pile: this.house.piles.combat,
+      x: centerColumnLeftSide,
+      y: CARDHEIGHT + 2 * BASEUNIT,
+      width: centerColumnWidth,
+      height: CARDHEIGHT,
+    });
+
+    this.addSlot({
+      id: 'playerFate',
+      pile: this.house.piles.playerFate,
+      x: centerColumnLeftSide + centerColumnWidth + BASEUNIT * 2,
+      y: BASEUNIT,
+      width: topAreaHeight,
+      height: CARDHEIGHT,
+      rotate: true,
+    });
+
+    this.addSlot({
+      id: 'playerStamina',
+      pile: this.house.piles.playerStamina,
+      x: BASEUNIT,
+      y: BASEUNIT,
+      width: topAreaHeight,
+      height: CARDHEIGHT,
+      rotate: true,
+    });
+
+    this.addSlot({
+      id: 'loot',
+      pile: this.house.piles.loot,
+      x: BASEUNIT,
+      y: topAreaHeight + 2 * BASEUNIT,
+      width: CARDHEIGHT,
+      height: CARDHEIGHT,
+      rotate: true,
+      reverse: true,
+    });
+
+    this.addSlot({
+      id: 'leftGear',
+      pile: this.house.piles.leftGear,
+      x: centerColumnLeftSide,
+      y: topAreaHeight + 2 * BASEUNIT,
+      width: CARDHEIGHT,
+      height: CARDHEIGHT,
+      rotate: true,
+      reverse: true,
+    });
+
+    this.addSlot({
+      id: 'centerGear',
+      pile: this.house.piles.centerGear,
+      x: (WIDTH - CARDHEIGHT) / 2,
+      y: topAreaHeight + BASEUNIT * 2,
+      width: CARDHEIGHT,
+      height: CARDHEIGHT,
+      rotate: true,
+      reverse: true,
+    });
+
+    this.addSlot({
+      id: 'rightGear',
+      pile: this.house.piles.rightGear,
+      x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT,
+      y: topAreaHeight + BASEUNIT * 2,
+      width: CARDHEIGHT,
+      height: CARDHEIGHT,
+      rotate: true,
+      reverse: true,
+    });
   }
 
   /**

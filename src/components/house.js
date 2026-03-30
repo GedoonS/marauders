@@ -39,7 +39,7 @@ class House {
   buildDecks(config) {
     for (const [deckName, cardEntries] of Object.entries(config.decks)) {
       if (!this.piles[deckName]) {
-        this.piles[deckName] = new Pile();
+        this.piles[deckName] = new Pile({ id: deckName });
       }
       cardEntries.forEach(({ cardType, count }) => {
         const factory = new cardType();

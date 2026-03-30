@@ -12,7 +12,14 @@ const game = {
     // stamina: [
     //   { cardType: Spirit6, cardCount: 10 }
     // ]
-    hand: [],
+    wrath: [],
+    playerStamina: [],
+    playerFate: [],
+    combat: [],
+    loot: [],
+    leftGear: [],
+    centerGear: [],
+    rightGear: [],
   },
   deal: {
     fate: 20,
@@ -20,4 +27,10 @@ const game = {
   },
 };
 
-export { game };
+const WIDTH = 420;
+const HEIGHT = 240;
+const BASEUNIT = Math.floor(HEIGHT / 40);
+const CARDWIDTH = BASEUNIT * 8;
+const CARDHEIGHT = BASEUNIT * 12;
+
+export { game, WIDTH, HEIGHT, BASEUNIT, CARDWIDTH, CARDHEIGHT };

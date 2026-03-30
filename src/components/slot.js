@@ -1,5 +1,6 @@
 import { CardRenderer } from './card-renderer';
 import * as PIXI from 'pixi.js';
+import { CARDWIDTH, CARDHEIGHT } from './config';
 
 class Slot {
   /**
@@ -14,7 +15,7 @@ class Slot {
    * @param {PIXI.Container} params.parentContainer - Table container
    * @param {PIXI.app} params.app - parent app
    */
-  constructor({ id, x, y, width, height, layout = 'fan', parentContainer, pile, textures }) {
+  constructor({ id, x, y, width, height, layout = 'fan', parentContainer, pile, textures, rotate, reverse }) {
     this.id = id;
     this.x = x;
     this.y = y;
@@ -22,12 +23,18 @@ class Slot {
     this.height = height;
     this.layout = layout;
     this.pile = pile;
+    this.rotate = rotate;
+    this.reverse = reverse;
 
     // Create a container for this slot
     this.parentContainer = parentContainer;
     this.container = new PIXI.Container();
     this.container.x = x;
     this.container.y = y;
+    if (this.rotate) {
+      this.container.rotation = Math.PI / 2;
+      this.container.x += CARDHEIGHT;
+    }
 
     this.parentContainer.addChild(this.container);
 
@@ -41,9 +48,10 @@ class Slot {
 
   async render() {
     let index = 0;
-    const cardSpacing = this.width / this.pile.cards.length;
+    const cardSpacing = (this.width - CARDWIDTH) / (this.pile.cards.length - 1);
     for (const card of this.pile.cards) {
-      await this.cardRenderer.render(card, index * cardSpacing, 0);
+      const cardOffset = this.reverse ? this.width - CARDWIDTH - index * cardSpacing : index * cardSpacing;
+      await this.cardRenderer.render(card, cardOffset, 0);
       index++;
     }
   }

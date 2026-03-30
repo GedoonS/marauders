@@ -1,0 +1,26 @@
+{
+  "name": "marauders",
+  "version": "1.0.0",
+  "description": "virtual card game",
+  "scripts": {
+    "start": "parcel public/index.html --open",
+    "build": "parcel build public/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@parcel/resolver-glob": "^2.16.4",
+    "@parcel/transformer-sass": "^2.16.4",
+    "parcel": "^2.16.4",
+    "parcel-plugin-static-files-copy": "^2.6.0"
+  },
+  "dependencies": {
+    "parcel-bundler": "^1.12.5",
+    "pixi.js": "^8.17.1"
+  },
+  "staticFiles": {
+    "staticPath": "/static",
+    "watcherGlob": "**"
+  }
+}

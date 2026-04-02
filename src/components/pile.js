@@ -24,13 +24,33 @@ class Pile {
       this.cards.sort(() => Math.random() - 0.5);
     }
   }
-
   /**
-   * Draws the top card from the pile
-   * @returns {Card|null} The drawn card or null if empty
+   * Draws a card from the pile
+   * @param {number|false} index - optional index, defaults to top card
+   * @returns {Card|null}
    */
-  draw() {
-    return this.cards.pop() || null;
+  draw(index = false) {
+    let card = null;
+    if (typeof index === 'number') {
+      if (index < 0 || index >= this.cards.length) return null;
+      [card] = this.cards.splice(index, 1);
+
+      console.log('drawing', index, card);
+    } else {
+      card = this.cards.pop() || null;
+    }
+
+    if (!card) return null;
+
+    // --- Detach from Pixi if rendered ---
+    card.container?.parent.removeChild(card.container);
+    card.backContainer?.parent.removeChild(card.backContainer);
+
+    // Optional: reset so renderer knows it must re-render
+    card.container = null;
+    card.backContainer = null;
+
+    return card;
   }
 
   /**
@@ -47,6 +67,18 @@ class Pile {
    */
   init(cards = []) {
     this.cards = [...cards];
+  }
+
+  /**
+   * Returns the sum of all card values in this pile
+   * @returns {number}
+   */
+  getSum() {
+    let sum = 0;
+    this.cards.forEach((card) => {
+      sum += card.getValue();
+    });
+    return sum;
   }
 }
 

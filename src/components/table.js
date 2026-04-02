@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { Slot } from './slot';
-import { BASEUNIT, CARDHEIGHT, WIDTH } from './config';
+import { BASEUNIT, CARDHEIGHT, WIDTH, HEIGHT } from './config';
 
 /**
  * Represents the visual layout of piles on screen
@@ -15,8 +15,16 @@ class Table {
     this.container.x = 0;
     this.container.y = 0;
     this.house = house;
+    this.app = app;
 
-    app.stage.addChild(this.container);
+    // Container just for action buttons
+    this.actionsContainer = new PIXI.Container();
+    this.container.addChild(this.actionsContainer);
+    this.actionsContainer.x = BASEUNIT * 56;
+    this.actionsContainer.y = BASEUNIT * 26;
+    this.app.stage.addChild(this.container);
+    this.cardClickListener = this.cardClickListener.bind(this);
+    document.addEventListener('game:cardPicked', this.cardClickListener);
   }
 
   /**
@@ -30,7 +38,6 @@ class Table {
    * @param {'fan'|'singles'} params.layout
    */
   addSlot({ id, x, y, width, height, layout = 'fan', pile, rotate = false, reverse = false }) {
-    console.log(id);
     const slot = new Slot({
       id,
       x,
@@ -43,6 +50,7 @@ class Table {
       pile,
       rotate,
       reverse,
+      app: this.app,
     });
 
     this.slots[id] = slot;
@@ -59,6 +67,9 @@ class Table {
     slot.setPile(pile);
   }
 
+  /**
+   * Constructs and lays out all slots on the table
+   */
   constructTable() {
     const topAreaHeight = CARDHEIGHT * 2 + BASEUNIT;
     const centerColumnWidth = Math.floor((WIDTH - (6 * BASEUNIT + 2 * CARDHEIGHT)) / BASEUNIT) * BASEUNIT;
@@ -121,7 +132,7 @@ class Table {
       width: CARDHEIGHT,
       height: CARDHEIGHT,
       rotate: true,
-      reverse: true,
+      //reverse: true,
     });
 
     this.addSlot({
@@ -132,7 +143,7 @@ class Table {
       width: CARDHEIGHT,
       height: CARDHEIGHT,
       rotate: true,
-      reverse: true,
+      //reverse: true,
     });
 
     this.addSlot({
@@ -143,7 +154,7 @@ class Table {
       width: CARDHEIGHT,
       height: CARDHEIGHT,
       rotate: true,
-      reverse: true,
+      //reverse: true,
     });
   }
 
@@ -155,8 +166,103 @@ class Table {
     return this.slots[slotId] || null;
   }
 
+  /**
+   * Renders all slots and UI elements
+   */
   render() {
     Object.values(this.slots).forEach((slot) => slot.render());
+    this.renderActions();
+  }
+
+  /**
+   * Renders available action buttons based on current house state
+   */
+  renderActions() {
+    // Clear old buttons
+    this.actionsContainer.removeChildren();
+
+    const actions = this.house.getActions();
+
+    const buttonWidth = CARDHEIGHT;
+    const buttonHeight = 2 * BASEUNIT;
+    const gap = BASEUNIT;
+
+    actions.forEach((actionObj, index) => {
+      const x = BASEUNIT;
+      const y = buttonHeight - BASEUNIT + index * (buttonHeight + gap);
+
+      // --- Button background ---
+      const bg = actionObj.message
+        ? new PIXI.Graphics().roundRect(0, 0, buttonWidth, buttonHeight, BASEUNIT / 2).fill(0xffffff)
+        : new PIXI.Graphics()
+            .roundRect(0, 0, buttonWidth, buttonHeight, BASEUNIT / 2)
+            .fill(0x000000)
+            .stroke({ width: 2, color: 0xffffff });
+
+      // --- Label ---
+      const text = new PIXI.Text({
+        text: actionObj.label,
+        style: {
+          fill: actionObj.message ? 0x000000 : 0xffffff,
+          fontSize: BASEUNIT,
+        },
+      });
+
+      text.anchor.set(0.5);
+      text.x = buttonWidth / 2;
+      text.y = buttonHeight / 2;
+
+      // --- Button container ---
+      const button = new PIXI.Container();
+      button.x = x;
+      button.y = y;
+
+      button.addChild(bg);
+      button.addChild(text);
+
+      // --- Interaction ---
+      button.eventMode = 'static';
+      button.cursor = 'pointer';
+
+      button.on('pointerdown', async () => {
+        await this.house.startAction(actionObj.action);
+        this.render();
+      });
+
+      this.actionsContainer.addChild(button);
+    });
+  }
+
+  /**
+   * Finds the current context (card, pile, slot) for a given card instance
+   * @param {Card} targetCard
+   * @returns {{card: Card, pile: Pile, slot: Slot}|null}
+   */
+  findCardContext(targetCard) {
+    for (const slot of Object.values(this.slots)) {
+      const pile = slot.pile;
+
+      const card = pile.cards.find((c) => c === targetCard);
+      if (card) {
+        return { card, pile, slot };
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Handles global card click events and forwards them to the house logic
+   * @param {CustomEvent} event
+   */
+  cardClickListener(event) {
+    const { card } = event.detail;
+
+    const context = this.findCardContext(card);
+    if (!context) return;
+
+    this.house.handleCardClick(context);
+
+    this.render();
   }
 }
 

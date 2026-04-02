@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +14,7 @@ body {
   background-color: #333;
 }
 
-$aspect-ratio: 420/240;
+$aspect-ratio: math.div(420, 240);
 canvas {
   display: block;
   margin-inline: auto;

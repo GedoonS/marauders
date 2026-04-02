@@ -1,14 +1,14 @@
 import { Card } from '~/src/components/card';
 import { CardFactory } from './card-factory';
-
+const demoGraphics = false;
 /**
- * Factory for generating Marauder Peasant cards.
- * Supports creating single enemies or groups via `enemyGroupSize`.
+ * Factory for generating Marauder cards.
  */
 class MarauderPeasant extends CardFactory {
   identity = 'marauder-peasant';
-  graphicId = 'peasant';
+  graphicId = demoGraphics ? 'threeoclubs' : 'peasant';
   baseSpirit = 10;
+  layout = 'enemy';
   /**
    * Creates one or more Marauder Peasant cards.
    *
@@ -17,14 +17,12 @@ class MarauderPeasant extends CardFactory {
    * @returns {Card} generated card.
    */
   create(config = { enemyGroupSize: 1 }) {
-    const { enemyGroupSize, baseSpirit } = config;
-    const spirit = enemyGroupSize * (baseSpirit || this.baseSpirit);
+    const { enemyGroupSize, baseSpirit, faceUp } = config;
+    const spirit = (enemyGroupSize || 1) * (baseSpirit || this.baseSpirit);
 
     const wrath = Math.floor(spirit / 10);
 
-    const id = [this.identity, enemyGroupSize, baseSpirit]
-      .filter(Boolean)
-      .join('-');
+    const id = [this.identity, enemyGroupSize, baseSpirit].filter(Boolean).join('-');
 
     return new Card({
       id,
@@ -32,26 +30,30 @@ class MarauderPeasant extends CardFactory {
       spirit,
       wrath,
       graphicId: this.graphicId,
+      faceUp,
+      layout: this.layout,
+      liveEnemy: true,
+      isEnemy: true,
     });
   }
 }
 
 class MarauderGuard extends MarauderPeasant {
   identity = 'marauder-guard';
-  graphicId = 'guard';
+  graphicId = demoGraphics ? 'threeoclubs' : 'guard';
   baseSpirit = 40;
 }
 
 class MarauderRoyalGuard extends MarauderPeasant {
   identity = 'marauder-royal-guard';
-  graphicId = 'royal-guard';
+  graphicId = demoGraphics ? 'threeoclubs' : 'royal-guard';
   baseSpirit = 70;
 }
 
 class MarauderPrincess extends MarauderPeasant {
   identity = 'marauder-princess';
-  graphicId = 'princess';
-  baseSpirit = 100;
+  graphicId = demoGraphics ? 'threeoclubs' : 'princess';
+  baseSpirit = 99;
 }
 
 export { MarauderPeasant, MarauderGuard, MarauderRoyalGuard, MarauderPrincess };

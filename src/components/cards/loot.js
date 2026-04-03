@@ -37,7 +37,7 @@ class LootSmall extends CardFactory {
       id,
       type: type ?? 'fate',
       lootValue: value,
-      spirit,
+      spirit: this.noSpirit ? 0 : spirit,
       graphicId: this.graphicId,
       faceUp,
       layout: this.layout,
@@ -59,24 +59,27 @@ class LootBig extends LootSmall {
 }
 
 class LootFateSmall extends LootSmall {
+  noSpirit = true;
   identity = 'loot-big';
   graphicId = demoGraphics ? 'threeoclubs' : 'luxurium-fate-medium';
   baseValue = 5;
-  layout = 'weapon';
+  layout = 'lootFate';
 }
 
 class LootFateMedium extends LootSmall {
+  noSpirit = true;
   identity = 'loot-big';
   graphicId = demoGraphics ? 'threeoclubs' : 'luxurium-fate-medium';
   baseValue = 8;
-  layout = 'weapon';
+  layout = 'lootFate';
 }
 
 class LootFateBig extends LootSmall {
+  noSpirit = true;
   identity = 'loot-big';
   graphicId = demoGraphics ? 'threeoclubs' : 'luxurium-fate-big';
   baseValue = 13;
-  layout = 'weapon';
+  layout = 'lootFate';
 }
 
 export { LootSmall, LootMedium, LootBig, LootFateSmall, LootFateMedium, LootFateBig };

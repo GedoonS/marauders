@@ -21,33 +21,33 @@ import {
 const game = {
   decks: {
     fate: [
-      //{ cardType: MarauderPeasant, count: 40 }, // 40%
+      { cardType: MarauderPeasant, count: 40 }, // 40%
       { cardType: MarauderGuard, count: 30 }, // 30%
       { cardType: MarauderRoyalGuard, count: 20 }, // 20%
       { cardType: MarauderPrincess, count: 10 }, // 10%
-      // { cardType: LootFateSmall, count: 20 },
-      // { cardType: LootFateMedium, count: 10 },
-      // { cardType: LootFateBig, count: 10 },
+      { cardType: LootFateSmall, count: 20 },
+      { cardType: LootFateMedium, count: 10 },
+      { cardType: LootFateBig, count: 10 },
     ],
     stamina: [
-      // { cardType: SwordWeak, count: 10, type: 'stamina' },
-      // { cardType: SwordMedium, count: 10, type: 'stamina' },
-      // { cardType: SwordStrong, count: 10, type: 'stamina' },
-      // { cardType: AxeWeak, count: 10, type: 'stamina' },
-      // { cardType: AxeMedium, count: 10, type: 'stamina' },
-      // { cardType: AxeStrong, count: 10, type: 'stamina' },
-      // { cardType: ShieldWeak, count: 10, type: 'stamina' },
-      // { cardType: ShieldMedium, count: 10, type: 'stamina' },
-      // { cardType: ShieldStrong, count: 10, type: 'stamina' },
-      // { cardType: ArmorWeak, count: 10, type: 'stamina' },
-      // { cardType: ArmorMedium, count: 10, type: 'stamina' },
-      // { cardType: ArmorStrong, count: 10, type: 'stamina' },
-      // { cardType: HelmetWeak, count: 10, type: 'stamina' },
-      // { cardType: HelmetMedium, count: 10, type: 'stamina' },
-      // { cardType: HelmetStrong, count: 10, type: 'stamina' },
-      { cardType: LootSmall, count: 10, type: 'stamina' },
-      { cardType: LootBig, count: 10, type: 'stamina' },
-      { cardType: LootMedium, count: 10, type: 'stamina' },
+      { cardType: SwordWeak, count: 8, type: 'stamina' },
+      { cardType: SwordMedium, count: 5, type: 'stamina' },
+      { cardType: SwordStrong, count: 2, type: 'stamina' },
+      { cardType: AxeWeak, count: 8, type: 'stamina' },
+      { cardType: AxeMedium, count: 5, type: 'stamina' },
+      { cardType: AxeStrong, count: 2, type: 'stamina' },
+      { cardType: ShieldWeak, count: 8, type: 'stamina' },
+      { cardType: ShieldMedium, count: 5, type: 'stamina' },
+      { cardType: ShieldStrong, count: 2, type: 'stamina' },
+      { cardType: ArmorWeak, count: 8, type: 'stamina' },
+      { cardType: ArmorMedium, count: 5, type: 'stamina' },
+      { cardType: ArmorStrong, count: 2, type: 'stamina' },
+      { cardType: HelmetWeak, count: 8, type: 'stamina' },
+      { cardType: HelmetMedium, count: 5, type: 'stamina' },
+      { cardType: HelmetStrong, count: 2, type: 'stamina' },
+      { cardType: LootSmall, count: 8, type: 'stamina' },
+      { cardType: LootBig, count: 5, type: 'stamina' },
+      { cardType: LootMedium, count: 2, type: 'stamina' },
     ],
     wrath: [],
     playerStamina: [],
@@ -58,28 +58,22 @@ const game = {
       // { cardType: LootMedium, count: 3, faceUp: true },
       // { cardType: LootBig, count: 3, faceUp: true },
     ],
-    leftGear: [
-      // { cardType: SwordWeak, count: 1, type: 'stamina', faceUp: true },
-      // { cardType: AxeStrong, count: 1, type: 'stamina', faceUp: true },
-    ],
-    centerGear: [
-      // { cardType: HelmetMedium, count: 1, type: 'stamina', faceUp: true },
-      // { cardType: ArmorStrong, count: 1, type: 'stamina', faceUp: true },
-    ],
-    rightGear: [
-      // { cardType: AxeMedium, count: 1, type: 'stamina', faceUp: true },
-      // { cardType: SwordStrong, count: 1, type: 'stamina', faceUp: true },
-    ],
+    trinketLeft: [],
+    gearLeftHand: [],
+    gearHead: [],
+    gearBody: [],
+    trinketRight: [],
+    gearRightHand: [],
     discardStamina: [],
     discardFate: [],
   },
   deal: [
-    { from: 'fate', to: 'playerFate', count: 10 },
-    { from: 'stamina', to: 'playerStamina', count: 10 },
+    { from: 'fate', to: 'playerFate', count: 20 },
+    { from: 'stamina', to: 'playerStamina', count: 20 },
   ],
 };
 
-const resolution = 4;
+const resolution = 2;
 
 const WIDTH = 420 * resolution;
 const HEIGHT = 240 * resolution;

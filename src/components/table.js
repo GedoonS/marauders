@@ -37,7 +37,7 @@ class Table {
    * @param {number} params.height
    * @param {'fan'|'singles'} params.layout
    */
-  addSlot({ id, x, y, width, height, layout = 'fan', pile, rotate = false, reverse = false }) {
+  addSlot({ id, x, y, width, height, layout = 'fan', pile, rotate = false, reverse = false, subtypeAllowed = null, maxCards = -1 }) {
     const slot = new Slot({
       id,
       x,
@@ -51,6 +51,9 @@ class Table {
       rotate,
       reverse,
       app: this.app,
+      table: this,
+      subtypeAllowed,
+      maxCards,
     });
 
     this.slots[id] = slot;
@@ -82,6 +85,7 @@ class Table {
       y: BASEUNIT,
       width: centerColumnWidth,
       height: CARDHEIGHT,
+      layout: 'evenodd',
     });
 
     this.addSlot({
@@ -91,6 +95,7 @@ class Table {
       y: CARDHEIGHT + 2 * BASEUNIT,
       width: centerColumnWidth,
       height: CARDHEIGHT,
+      //layout: 'evenodd',
     });
 
     this.addSlot({
@@ -101,6 +106,7 @@ class Table {
       width: topAreaHeight,
       height: CARDHEIGHT,
       rotate: true,
+      //layout: 'evenodd',
     });
 
     this.addSlot({
@@ -111,6 +117,7 @@ class Table {
       width: topAreaHeight,
       height: CARDHEIGHT,
       rotate: true,
+      //layout: 'evenodd',
     });
 
     this.addSlot({
@@ -124,37 +131,83 @@ class Table {
       reverse: true,
     });
 
+    // gearLeft: [],
+    // gearLeftHand: [],
+    // gearHead: [],
+    // gearBody: [],
+    // gearRight: [],
+    // gearRightHand: [],
+
     this.addSlot({
-      id: 'leftGear',
-      pile: this.house.piles.leftGear,
+      id: 'gearLeftHand',
+      pile: this.house.piles.gearLeftHand,
       x: centerColumnLeftSide,
       y: topAreaHeight + 2 * BASEUNIT,
-      width: CARDHEIGHT,
+      width: CARDHEIGHT / 2,
       height: CARDHEIGHT,
       rotate: true,
-      //reverse: true,
+      subtypeAllowed: 'hand',
+      maxCards: 1,
     });
 
     this.addSlot({
-      id: 'centerGear',
-      pile: this.house.piles.centerGear,
+      id: 'trinketLeft',
+      pile: this.house.piles.trinketLeft,
+      x: centerColumnLeftSide,
+      y: topAreaHeight + CARDHEIGHT / 2 + 2 * BASEUNIT,
+      width: CARDHEIGHT / 2,
+      height: CARDHEIGHT,
+      rotate: true,
+      subtypeAllowed: 'trinket',
+      maxCards: 1,
+    });
+
+    this.addSlot({
+      id: 'gearHead',
+      pile: this.house.piles.gearHead,
       x: (WIDTH - CARDHEIGHT) / 2,
       y: topAreaHeight + BASEUNIT * 2,
-      width: CARDHEIGHT,
+      width: CARDHEIGHT / 2,
       height: CARDHEIGHT,
       rotate: true,
-      //reverse: true,
+      subtypeAllowed: 'helmet',
+      maxCards: 1,
     });
 
     this.addSlot({
-      id: 'rightGear',
-      pile: this.house.piles.rightGear,
-      x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT,
-      y: topAreaHeight + BASEUNIT * 2,
-      width: CARDHEIGHT,
+      id: 'gearBody',
+      pile: this.house.piles.gearBody,
+      x: (WIDTH - CARDHEIGHT) / 2,
+      y: topAreaHeight + CARDHEIGHT / 2 + 2 * BASEUNIT,
+      width: CARDHEIGHT / 2,
       height: CARDHEIGHT,
       rotate: true,
-      //reverse: true,
+      subtypeAllowed: 'armor',
+      maxCards: 1,
+    });
+
+    this.addSlot({
+      id: 'gearRightHand',
+      pile: this.house.piles.gearRightHand,
+      x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT,
+      y: topAreaHeight + BASEUNIT * 2,
+      width: CARDHEIGHT / 2,
+      height: CARDHEIGHT,
+      rotate: true,
+      subtypeAllowed: 'hand',
+      maxCards: 1,
+    });
+
+    this.addSlot({
+      id: 'trinketRight',
+      pile: this.house.piles.trinketRight,
+      x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT,
+      y: topAreaHeight + CARDHEIGHT / 2 + 2 * BASEUNIT,
+      width: CARDHEIGHT / 2,
+      height: CARDHEIGHT,
+      rotate: true,
+      subtypeAllowed: 'trinket',
+      maxCards: 1,
     });
   }
 
@@ -199,18 +252,23 @@ class Table {
             .fill(0x000000)
             .stroke({ width: 2, color: 0xffffff });
 
+      const antiAntiAliasingScaling = 4;
+
       // --- Label ---
       const text = new PIXI.Text({
         text: actionObj.label,
         style: {
           fill: actionObj.message ? 0x000000 : 0xffffff,
-          fontSize: BASEUNIT,
+          fontSize: BASEUNIT * antiAntiAliasingScaling,
         },
       });
 
       text.anchor.set(0.5);
       text.x = buttonWidth / 2;
       text.y = buttonHeight / 2;
+
+      text.scale.y = 1 / antiAntiAliasingScaling;
+      text.scale.x = 1 / antiAntiAliasingScaling;
 
       // --- Button container ---
       const button = new PIXI.Container();
@@ -263,6 +321,12 @@ class Table {
     this.house.handleCardClick(context);
 
     this.render();
+  }
+
+  unselectSlots(ignoreSlot) {
+    Object.values(this.slots).forEach((slot) => {
+      if (slot !== ignoreSlot) slot.toggleSelected(false);
+    });
   }
 }
 

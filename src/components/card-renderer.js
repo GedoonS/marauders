@@ -22,10 +22,14 @@ const cardLayouts = {
   ],
   enemy: [
     { prop: 'spirit', x: 1.4, y: 1.2, rotate: 0 },
-    { prop: 'wrath', x: 7, y: 11, rotate: 180 },
+    { prop: 'wrath', x: 6.65, y: 10.75, rotate: 180 },
   ],
   loot: [
     { prop: 'spirit', x: 4, y: 2, rotate: 0, fontSize: 1.5 },
+    { prop: 'lootValue', x: 1.3, y: 10.75, rotate: 270 },
+  ],
+  lootFate: [
+    //{ prop: 'spirit', x: 4, y: 2, rotate: 0, fontSize: 1.5 },
     { prop: 'lootValue', x: 1.3, y: 10.75, rotate: 270 },
   ],
 };
@@ -51,10 +55,10 @@ class CardRenderer {
   async render(card, x, y) {
     if (!card) return;
     if (card.faceUp) {
-      // If already rendered, just move it
       if (card.container) {
-        card.container.x = x;
-        card.container.y = y;
+        card.targetX = x;
+        card.targetY = y;
+        card.animateMovement();
         return;
       }
 
@@ -73,6 +77,10 @@ class CardRenderer {
       const cardContainer = new PIXI.Container();
       cardContainer.x = x;
       cardContainer.y = y;
+      card.targetX = x;
+      card.targetY = y;
+      card.x = x;
+      card.y = y;
 
       cardContainer.pivot.set(sprite.width / 2, sprite.height / 2);
 
@@ -115,8 +123,10 @@ class CardRenderer {
    */
   async renderCardBack(card, x, y) {
     if (card.backContainer) {
-      card.backContainer.x = x;
-      card.backContainer.y = y;
+      card.targetX = x;
+      card.targetY = y;
+      card.animateMovement();
+
       return;
     }
 
@@ -166,10 +176,7 @@ class CardRenderer {
    */
   printLabels(card, cardContainer) {
     const layout = cardLayouts[card.layout] ?? [];
-
     const antiAntiAliasingScaling = 4;
-
-    console.log({ card, layout });
 
     layout.forEach((item) => {
       let value = item.prop.split('.').reduce((o, k) => o?.[k], card);

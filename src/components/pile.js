@@ -7,13 +7,35 @@ class Pile {
   /**
    * @param {Object} params
    * @param {string} params.id - Identifier for the pile (e.g. PLAYER_FATE)
-   * @param {string|null} [params.owner=null] - Owner of the pile (player, house, etc.)
    * @param {Card[]} [params.cards=[]] - Initial cards in the pile
+   * @param {string|null} [params.subtypeAllowed=null] - Accepted subtypes for this pile (for example 'hand', 'helmet'
    */
-  constructor({ id, owner = null, cards = [] } = {}) {
+  constructor({ id, owner = null, cards = [], subtypeAllowed = null } = {}) {
     this.id = id;
     this.owner = owner;
     this.cards = cards;
+    this.subtypeAllowed = subtypeAllowed;
+  }
+
+  /**
+   * @param {Slot[]} [slot] - Parent slot of the pile
+   * */
+  setParentSlot(slot) {
+    this.slot = slot;
+  }
+
+  /**
+   * @param {string} subtypeAllowed - Accepted subtypes for this pile (for example 'hand', 'helmet'
+   */
+  setSubtypeAllowed(subtypeAllowed) {
+    this.subtypeAllowed = subtypeAllowed;
+  }
+
+  /**
+   * @param {number} maxCards - Maximum number of cards the pile can hold
+   */
+  setMaxCards(maxCards) {
+    this.maxCards = maxCards;
   }
 
   /**
@@ -34,8 +56,6 @@ class Pile {
     if (typeof index === 'number') {
       if (index < 0 || index >= this.cards.length) return null;
       [card] = this.cards.splice(index, 1);
-
-      console.log('drawing', index, card);
     } else {
       card = this.cards.pop() || null;
     }

@@ -19,6 +19,7 @@ class GenericWeapon extends CardFactory {
   baseValue = 2;
   combatType = 'add';
   layout = 'weapon';
+  subtype = 'hand';
 
   /**
    * Creates one or more Marauder Peasant cards.
@@ -31,6 +32,7 @@ class GenericWeapon extends CardFactory {
     const value = rollRng(this.identity);
     const combat = {
       [this.combatType]: this.baseValue,
+      subtype: this.subtype,
     };
 
     const id = [this.identity, value].filter(Boolean).join('-');
@@ -43,6 +45,7 @@ class GenericWeapon extends CardFactory {
       faceUp,
       combat,
       layout: this.layout,
+      isWeapon: true,
     });
   }
 }
@@ -52,6 +55,7 @@ class SwordWeak extends GenericWeapon {
   graphicId = 'sword-weak';
   baseValue = 2;
   combatType = 'multiply';
+  subtype = 'hand';
 }
 
 class SwordMedium extends GenericWeapon {
@@ -59,6 +63,7 @@ class SwordMedium extends GenericWeapon {
   graphicId = 'sword-medium';
   baseValue = 2;
   combatType = 'multiply';
+  subtype = 'hand';
 }
 
 class SwordStrong extends GenericWeapon {
@@ -66,60 +71,70 @@ class SwordStrong extends GenericWeapon {
   graphicId = 'sword-strong';
   baseValue = 3;
   combatType = 'multiply';
+  subtype = 'hand';
 }
 
 class AxeWeak extends GenericWeapon {
   identity = 'axe-weak';
   graphicId = 'axe-weak';
   baseValue = 1;
+  subtype = 'hand';
 }
 
 class AxeMedium extends GenericWeapon {
   identity = 'axe-medium';
   graphicId = 'axe-medium';
   baseValue = 4;
+  subtype = 'hand';
 }
 
 class AxeStrong extends GenericWeapon {
   identity = 'axe-strong';
   graphicId = 'axe-strong';
   baseValue = 7;
+  subtype = 'hand';
 }
 
 class ShieldWeak extends GenericWeapon {
   identity = 'shield-weak';
   graphicId = 'shield-weak';
   baseValue = 1;
+  subtype = 'hand';
 }
 
 class ShieldMedium extends GenericWeapon {
   identity = 'shield-medium';
   graphicId = 'shield-medium';
   baseValue = 4;
+  subtype = 'hand';
 }
 
 class ShieldStrong extends GenericWeapon {
   identity = 'shield-strong';
   graphicId = 'shield-strong';
   baseValue = 7;
+  subtype = 'hand';
 }
 
 class ArmorWeak extends GenericWeapon {
   identity = 'armor-weak';
   graphicId = 'armor-weak';
   baseValue = 1;
+  subtype = 'armor';
 }
 
 class ArmorMedium extends GenericWeapon {
   identity = 'armor-medium';
   graphicId = 'armor-medium';
   baseValue = 4;
+  subtype = 'armor';
 }
 
 class ArmorStrong extends GenericWeapon {
   identity = 'armor-strong';
   graphicId = 'armor-strong';
   baseValue = 7;
+  subtype = 'armor';
 }
 
 class HelmetWeak extends GenericWeapon {
@@ -127,6 +142,7 @@ class HelmetWeak extends GenericWeapon {
   graphicId = 'helmet-weak';
   baseValue = 2;
   combatType = 'multiply';
+  subtype = 'helmet';
 }
 
 class HelmetMedium extends GenericWeapon {
@@ -134,6 +150,7 @@ class HelmetMedium extends GenericWeapon {
   graphicId = 'helmet-medium';
   baseValue = 3;
   combatType = 'multiply';
+  subtype = 'helmet';
 }
 
 class HelmetStrong extends GenericWeapon {
@@ -141,6 +158,7 @@ class HelmetStrong extends GenericWeapon {
   graphicId = 'helmet-strong';
   baseValue = 4;
   combatType = 'multiply';
+  subtype = 'helmet';
 }
 
 export {

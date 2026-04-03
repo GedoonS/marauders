@@ -58,37 +58,14 @@ async function main() {
   const maxCards = 16;
   const delay = 400; // ms
 
-  // house.deal('fate', 'playerFate', 20, false);
-  // house.deal('stamina', 'playerStamina', 20, false);
   table.render();
 
   // app.ticker.add((ticker) => {
   //   if (dealt >= maxCards) return;
-
   //   elapsed += ticker.deltaMS;
-
   //   if (elapsed >= delay) {
   //     elapsed = 0;
-
-  //     house.deal('fate', 'playerFate', 1, false);
-  //     house.deal('stamina', 'playerStamina', 1, false);
-
-  //     if (dealt < maxCards / 3) {
-  //       house.deal('fate', 'wrath', 1, true);
-  //       house.deal('stamina', 'combat', 1, true);
-  //     }
-
-  //     // if (dealt < maxCards / 2) {
-  //     //   house.deal('fate', 'loot', 1, true);
-  //     // }
-  //     // if (dealt < 2) {
-  //     //   house.deal('stamina', 'leftGear', 1, true);
-  //     //   house.deal('stamina', 'centerGear', 1, true);
-  //     //   house.deal('stamina', 'rightGear', 1, true);
-  //     // }
-
   //     table.render();
-
   //     dealt++;
   //   }
   // });

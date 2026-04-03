@@ -1,9 +1,27 @@
 import { CardRenderer } from './card-renderer';
 import * as PIXI from 'pixi.js';
 import { CARDWIDTH, CARDHEIGHT, BASEUNIT } from './config';
+import { Table } from './table';
 
+const selectables = ['trinketLeft', 'gearLeftHand', 'gearHead', 'gearBody', 'trinketRight', 'gearRightHand'];
 class Slot {
   maxCards = 0;
+  isSelected = false;
+
+  ticker = PIXI.Ticker.shared;
+
+  alphaAnimation = {
+    // target: 0.5,
+    // isAnimating: false,
+    // direction: 1, // 1 = increasing, -1 = decreasing
+    // min: 0.3,
+    // max: 0.7,
+    // speed: 0.003,
+
+    counter: 0,
+    isAnimating: false,
+    speed: 0.03, // tweak to make it faster or slower
+  };
 
   /**
    * @param {Object} params
@@ -13,11 +31,29 @@ class Slot {
    * @param {number} params.width
    * @param {number} params.height
    * @param {Pile} params.pile
-   * @param {'fan'|'singles'} params.layout
+   * @param {'fan'|'singles'|'evenodd'} params.layout
    * @param {PIXI.Container} params.parentContainer - Table container
    * @param {PIXI.app} params.app - parent app
+   * @param {string|null} [params.subtypeAllowed=null] - Accepted subtypes for this pile (for example 'hand', 'helmet'
+   * @param {Table} params.table
    */
-  constructor({ id, x, y, width, height, layout = 'fan', parentContainer, pile, textures, rotate, reverse, app }) {
+  constructor({
+    id,
+    x,
+    y,
+    width,
+    height,
+    layout = 'fan',
+    parentContainer,
+    pile,
+    textures,
+    rotate,
+    reverse,
+    app,
+    table,
+    subtypeAllowed = null,
+    maxCards = -1,
+  }) {
     this.id = id;
     this.x = x;
     this.y = y;
@@ -28,6 +64,13 @@ class Slot {
     this.rotate = rotate;
     this.reverse = reverse;
     this.app = app;
+    this.table = table;
+    this.subtypeAllowed = subtypeAllowed;
+    this.maxCards = maxCards;
+
+    this.pile.setParentSlot(this);
+    if (subtypeAllowed) this.pile.setSubtypeAllowed(subtypeAllowed);
+    if (maxCards > 0) this.pile.setMaxCards(maxCards);
 
     // Create a container for this slot
     this.parentContainer = parentContainer;
@@ -41,6 +84,28 @@ class Slot {
     }
 
     this.parentContainer.addChild(this.container);
+    this.initStatusText();
+
+    this.outline = new PIXI.Graphics()
+      .roundRect(-2, -2, this.width + 4, this.height + 4, BASEUNIT)
+      .fill(0x010101)
+      .stroke({ width: 2, color: 0xffffff });
+    this.outline.x = -CARDWIDTH / 2;
+    this.outline.y = -CARDHEIGHT / 2;
+    this.outline.alpha = 0.1;
+
+    if (selectables.includes(this.id)) {
+      this.outline.eventMode = 'static';
+      this.outline.cursor = 'pointer';
+      this.outline.on('pointerdown', () => {
+        if (this.expectsSelection) {
+          this.table.unselectSlots(this);
+          this.toggleSelected();
+        }
+      });
+    }
+
+    this.container.addChild(this.outline);
 
     this.cardRenderer = new CardRenderer({
       container: this.container,
@@ -52,47 +117,115 @@ class Slot {
   async render() {
     this.maxCards = Math.max(this.maxCards, this.pile.cards.length);
     let index = 0;
-    const cardSpacing = (this.width - CARDWIDTH) / Math.max(1, this.maxCards - 1);
+    const cardSpacing = Math.min(CARDWIDTH + BASEUNIT, (this.width - CARDWIDTH) / Math.max(1, this.maxCards - 1));
     for (const card of this.pile.cards) {
-      const cardOffset = Math.floor(this.reverse ? this.width - CARDWIDTH - index * cardSpacing : index * cardSpacing);
+      const cardOffset = this.getCardPosition(index, cardSpacing);
       await this.cardRenderer.render(card, cardOffset, 0);
       index++;
     }
     this.renderSum();
   }
 
+  getCardPosition(index, cardSpacing) {
+    const cardsAmount = this.pile.cards.length;
+    if (this.layout === 'evenodd') {
+      const relativeWidth = Math.min(this.width, cardsAmount * CARDWIDTH * 0.7);
+      const underWideOffset = Math.floor((this.width - relativeWidth) / 2);
+      const spacing = Math.floor((relativeWidth - CARDWIDTH / 1.5) / cardsAmount);
+
+      if (index % 2 === 0) {
+        return underWideOffset + spacing * (index / 2) - Math.floor(BASEUNIT / 2);
+      } else {
+        return underWideOffset + relativeWidth - CARDWIDTH - spacing * ((index - 1) / 2) + Math.floor(BASEUNIT / 2);
+      }
+    }
+    const relativeWidth = Math.min(this.width, cardsAmount * CARDWIDTH);
+
+    const underWideOffset = Math.floor((this.width - relativeWidth) / 2);
+
+    return underWideOffset + Math.floor(this.reverse ? relativeWidth - CARDWIDTH - index * cardSpacing : index * cardSpacing);
+    // return Math.floor(this.reverse ? relativeWidth - CARDWIDTH - index * cardSpacing : index * cardSpacing);
+  }
+
+  initStatusText() {
+    if (!this.statusText) {
+      const antiAntiAliasingScaling = 4;
+      this.statusText = new PIXI.Text({
+        text: '',
+        style: {
+          fontSize: BASEUNIT * 1 * antiAntiAliasingScaling,
+          fill: 0xffffff,
+          stroke: 0x000000,
+        },
+      });
+      this.statusText.anchor.set(0.5, 0.5); // bottom right
+      this.statusText.scale.y = 1 / antiAntiAliasingScaling;
+      this.statusText.scale.x = 1 / antiAntiAliasingScaling;
+      if (this.rotate) {
+        this.statusText.rotation -= Math.PI / 2;
+        //this.container.x += CARDHEIGHT;
+        this.statusText.y = -this.width / 2 - BASEUNIT; //this.height;
+        this.statusText.x = this.height / 2 + BASEUNIT * 2; //this.height; // - CARDHEIGHT / 2 + BASEUNIT * 2;
+      } else {
+        this.statusText.x = this.width - CARDHEIGHT / 2 + BASEUNIT * 1.5;
+        this.statusText.y = this.height - BASEUNIT * 1.5 - CARDWIDTH / 2;
+      }
+
+      this.container.addChild(this.statusText);
+    }
+  }
+
   renderSum() {
     if (['wrath', 'combat', 'loot'].includes(this.id)) {
       // --- Draw pile sum in lower right corner ---
       const sum = this.pile.getSum();
-      if (!this.sumText) {
-        this.sumText = new PIXI.Text({
-          text: sum,
-          style: {
-            fontSize: BASEUNIT * 1,
-            fill: 0xffffff,
-            stroke: 0x000000,
-          },
-        });
-        this.sumText.anchor.set(0.5, 0.5); // bottom right
+      this.statusText.text = sum;
+      this.statusText.alpha = sum > 0 ? 1 : 0;
+    }
+  }
 
-        if (this.rotate) {
-          this.sumText.rotation -= Math.PI / 2;
-          //this.container.x += CARDHEIGHT;
-          this.sumText.y = -this.width / 2 - BASEUNIT; //this.height;
-          this.sumText.x = this.height / 2 + BASEUNIT * 2; //this.height; // - CARDHEIGHT / 2 + BASEUNIT * 2;
-        } else {
-          this.sumText.x = this.width - CARDHEIGHT / 2 + BASEUNIT * 1.5;
-          this.sumText.y = this.height - BASEUNIT * 1.5 - CARDWIDTH / 2;
-        }
+  toggleSelected(state = undefined) {
+    this.isSelected = state ?? !this.isSelected;
+    //if (this.isSelected) this.toggleExpectsSelection(false);
+    setTimeout(() => {
+      this.outline.alpha = this.isSelected ? 1 : 0.1;
+    }, 100);
+  }
 
-        this.container.addChild(this.sumText);
-      } else {
-        this.sumText.text = sum;
+  toggleExpectsSelection(state = undefined) {
+    this.expectsSelection = state ?? !this.isSelected;
+    //this.outline.alpha = this.isSelected ? 1 : 0.5;
+
+    if (this.expectsSelection) {
+      this.startAlphaPulse();
+    } else {
+      this.stopAlphaPulse();
+    }
+  }
+
+  startAlphaPulse() {
+    if (this.alphaAnimation.isAnimating) return;
+
+    this.alphaAnimation.isAnimating = true;
+    const anim = () => {
+      if (!this.expectsSelection) {
+        this.outline.alpha = 0.1; // reset
+        this.ticker.remove(anim);
+        this.alphaAnimation.isAnimating = false;
+        return;
       }
 
-      //if (this.sumText) this.sumText.alpha = sum > 0 ? 1 : 0;
-    }
+      this.alphaAnimation.counter += this.alphaAnimation.speed;
+      if (!this.isSelected) this.outline.alpha = 0.4 + Math.sin(this.alphaAnimation.counter) / 4; // alpha in ~0.17..0.83
+    };
+
+    this.ticker.add(anim);
+  }
+
+  stopAlphaPulse() {
+    this.alphaAnimation.isAnimating = false;
+    this.alphaAnimation.counter = 0;
+    this.outline.alpha = 0.5;
   }
 }
 

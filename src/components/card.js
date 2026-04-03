@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 /**
  * @typedef {Object} Combat
  * @property {'add'|'multiply'} type - Type of modifier
@@ -9,6 +11,19 @@
  */
 class Card {
   isSelectedState = false;
+  ticker = PIXI.Ticker.shared;
+
+  x = 0;
+  y = 0;
+  targetX = 0;
+  targetY = 0;
+  rotation = 0;
+  targetRotation = 0;
+  isMoving = false;
+  isRotating = false;
+
+  container = null;
+  backContainer = null;
 
   /**
    * @param {Object} params
@@ -39,6 +54,7 @@ class Card {
     liveEnemy = false,
     isLoot = false,
     isEnemy = false,
+    isWeapon = false,
   }) {
     this.id = id;
     this.type = type;
@@ -53,6 +69,7 @@ class Card {
     this.isLoot = isLoot;
     this.isEnemy = isEnemy;
     this.lootValue = lootValue;
+    this.isWeapon = isWeapon;
   }
 
   /**
@@ -81,10 +98,15 @@ class Card {
     if (this.isEnemy) {
       return this.liveEnemy ? this.spirit : this.wrath;
     } else if (this.isLoot) {
-      return this.spirit;
+      return this.isLooted ? this.lootValue : this.spirit;
     } else {
       return this.spirit;
     }
+  }
+
+  looted() {
+    if (!this.isLoot) return; // Only loot can be looted
+    this.isLooted = true;
   }
 
   defeated() {
@@ -95,11 +117,17 @@ class Card {
 
     // Flip the Pixi container if it exists
     if (this.container) {
-      this.container.rotation = Math.PI;
+      //this.container.rotation = Math.PI;
+      this.targetRotation = Math.PI;
+      this.animateRotation();
     }
 
     // Optionally, you could update the card value logic automatically
     // but your getValue() already uses liveEnemy/spirit/wrath correctly
+  }
+
+  getSubtype() {
+    return this.combat?.subtype ?? 'generic';
   }
 
   get isSelected() {
@@ -108,10 +136,78 @@ class Card {
 
   set isSelected(value) {
     this.isSelectedState = Boolean(value);
-
     if (this.container) {
-      this.container.rotation = this.isSelectedState ? Math.PI / 2 : 0;
+      //this.container.rotation = this.isSelectedState ? Math.PI / 2 : 0;
+      this.targetRotation = this.isSelectedState ? Math.PI / 2 : 0;
+      this.animateRotation();
     }
+  }
+
+  /**
+   * Animate movement of the card towards targetX / targetY
+   */
+  animateMovement() {
+    if (this.isMoving) return;
+
+    this.isMoving = true;
+    const speed = 0.15;
+
+    const step = () => {
+      const dx = this.targetX - this.x;
+      const dy = this.targetY - this.y;
+
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+        this.x = this.targetX;
+        this.y = this.targetY;
+
+        this.ticker.remove(step);
+        this.isMoving = false;
+      } else {
+        this.x += dx * speed;
+        this.y += dy * speed;
+      }
+
+      if (this.container) {
+        this.container.x = this.x;
+        this.container.y = this.y;
+      }
+      return;
+    };
+
+    this.ticker.add(step);
+  }
+
+  animateRotation() {
+    if (this.isRotating) return;
+
+    this.isRotating = true;
+
+    const speed = 0.05; // tweak this
+
+    const step = () => {
+      const diff = this.targetRotation - this.rotation;
+
+      // close enough → snap and stop
+      if (Math.abs(diff) < 0.01) {
+        this.rotation = this.targetRotation;
+        if (this.container) {
+          this.container.rotation = this.rotation;
+        }
+
+        this.ticker.remove(step);
+        this.isRotating = false;
+        return;
+      }
+
+      // move toward target
+      this.rotation += diff * speed;
+
+      if (this.container) {
+        this.container.rotation = this.rotation;
+      }
+    };
+
+    this.ticker.add(step);
   }
 }
 

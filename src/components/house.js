@@ -75,22 +75,48 @@ class House {
     }
 
     for (const { from, to, count } of config.deal) {
-      this.deal(from, to, count);
+      this.deal({
+        fromId: from,
+        toId: to,
+        count: count,
+      });
     }
   }
 
   /**
-   * Deals N cards from one pile to another
+   * Deals cards from one pile to another using an options object
+   * @param {Object} params
+   * @param {string} params.fromId
+   * @param {string} params.toId
+   * @param {Pile} params.fromPile
+   * @param {Pile} params.toPile
+   * @param {number} [params.count=1] - number of cards to draw
+   * @param {number} [params.index] - specific index to draw from
+   * @param {boolean} [params.faceUp]
    */
-  deal(fromId, toId, count = 1, faceUp = undefined) {
-    const from = this.getPile(fromId);
-    const to = this.getPile(toId);
+  deal({ fromId, fromPile, toPile, toId, count = 1, index, faceUp }) {
+    const from = fromPile ?? this.getPile(fromId);
+    const to = toPile ?? this.getPile(toId);
     if (!from || !to) return;
+
+    if (typeof index === 'number') {
+      const card = from.draw(index);
+
+      if (card) {
+        if (typeof faceUp === 'boolean') card.turn(faceUp);
+        if (to.maxCards === to.cards.length) to.draw(0);
+
+        to.add(card);
+      }
+
+      return;
+    }
 
     for (let i = 0; i < count; i++) {
       const card = from.draw();
 
       if (card) {
+        if (to.maxCards === to.cards.length) to.draw(0);
         if (typeof faceUp === 'boolean') card.turn(faceUp);
         to.add(card);
       }
@@ -125,9 +151,26 @@ class House {
    */
   handleCardClick(context) {
     if ([ACTIONS.LOOT_SELECTION.action].includes(this.state)) {
-      const { card, pile } = context;
-      for (const pilecard of pile.cards) if (pilecard !== card) pilecard.isSelected = false;
-      if (card) card.isSelected = !card.isSelected;
+      const { card, pile, slot } = context;
+
+      if (slot?.expectsSelection) {
+        slot.toggleSelected();
+      } else if (card) {
+        for (const pilecard of pile.cards) if (pilecard !== card) pilecard.isSelected = false;
+        card.isSelected = !card.isSelected;
+        const subtype = card.getSubtype();
+        if (card.isSelected && subtype) {
+          Object.values(this.piles).forEach((pile) => {
+            if (pile.slot?.expectsSelection) pile.slot.toggleExpectsSelection(false);
+          });
+
+          Object.values(this.piles).forEach((pile) => {
+            if (pile.subtypeAllowed === subtype) {
+              pile.slot.toggleExpectsSelection(true);
+            }
+          });
+        }
+      }
     }
   }
 
@@ -139,83 +182,217 @@ class House {
   }
 
   /**
-   * Starts an action and updates game state accordingly
+   * Routes and executes a game action based on the provided action key
    * @param {string} action
-   * @returns {Promise<boolean>}
+   * @returns {boolean}
    */
-  async startAction(action) {
+  startAction(action) {
     switch (action) {
-      case ACTIONS.DRAW_FATE.action: {
-        this.deal('playerFate', 'wrath', 1, true);
+      case ACTIONS.RUN.action:
+        return this.handleRun();
 
-        if (this.hasLoot('wrath')) {
-          this.state = 'loot_visible';
-          return true;
-        }
-        if (this.hasLiveEnemy('wrath')) {
-          this.state = 'enemy_visible';
-        }
-        return true;
+      case ACTIONS.DRAW_FATE.action:
+        return this.handleDrawFate();
+
+      case ACTIONS.STASH_LOOT.action:
+        return this.handleStashLoot();
+
+      case ACTIONS.LOOT_SELECTION.action:
+        return this.handleLootSelection();
+
+      case ACTIONS.COMBAT.action:
+        this.handleCombat();
+
+      case ACTIONS.DRAW_STAMINA.action:
+        return this.handleDrawStamina();
+    }
+  }
+
+  /**
+   * Handles player running away from combat:
+   * removes live enemies from wrath and discards combat cards
+   * @returns {boolean}
+   */
+  handleRun() {
+    const wrath = this.getPile('wrath');
+    const discardFate = this.getPile('discardFate');
+
+    for (let i = wrath.cards.length - 1; i >= 0; i--) {
+      const card = wrath.cards[i];
+      if (card.liveEnemy) {
+        this.deal({ fromId: 'wrath', toId: 'discardFate', index: i });
       }
+    }
 
-      case ACTIONS.STASH_LOOT.action: {
-        const wrath = this.getPile('wrath');
-        const lootPile = this.getPile('loot');
-        for (let i = wrath.cards.length - 1; i >= 0; i--) {
-          const card = wrath.cards[i];
-          if (card.isLoot) {
-            const drawn = wrath.draw(i);
-            if (drawn) lootPile.add(drawn);
-          }
-        }
+    const combatPile = this.getPile('combat');
+
+    this.deal({
+      fromId: 'combat',
+      toId: 'discardStamina',
+      count: combatPile.cards.length,
+    });
+
+    this.state = 'idle';
+    return true;
+  }
+
+  /**
+   * Draws a fate card into wrath and updates state based on result
+   * @returns {boolean}
+   */
+  handleDrawFate() {
+    this.deal({
+      fromId: 'playerFate',
+      toId: 'wrath',
+      count: 1,
+      faceUp: true,
+    });
+
+    if (this.hasLoot('wrath')) {
+      this.state = 'loot_visible';
+      return true;
+    }
+
+    if (this.hasLiveEnemy('wrath')) {
+      this.state = 'enemy_visible';
+    }
+
+    return true;
+  }
+
+  /**
+   * Moves all loot from wrath into loot pile and marks them as looted
+   * @returns {boolean}
+   */
+  handleStashLoot() {
+    const wrath = this.getPile('wrath');
+    const lootPile = this.getPile('loot');
+
+    for (let i = wrath.cards.length - 1; i >= 0; i--) {
+      const card = wrath.cards[i];
+      if (card.isLoot) {
+        card.looted();
+        this.deal({ fromId: 'wrath', toId: 'loot', index: i });
+      }
+    }
+
+    this.state = 'idle';
+    return true;
+  }
+
+  /**
+   * Handles loot selection from combat pile:
+   * - loot cards go directly to loot pile
+   * - weapons require a selected destination slot
+   * @returns {boolean}
+   */
+  handleLootSelection() {
+    const combatPile = this.getPile('combat');
+    const lootPile = this.getPile('loot');
+
+    if (!combatPile.cards.some((card) => card.isSelected)) return true;
+
+    for (let i in combatPile.cards) {
+      i = parseInt(i);
+      const combatCard = combatPile.cards[i];
+
+      if (!combatCard.isSelected) continue;
+
+      // --- loot ---
+      if (combatCard.isLoot) {
+        combatCard.looted();
+        this.deal({
+          fromId: 'combat',
+          toId: 'loot',
+          index: i,
+        });
+
+        this.deal({
+          fromId: 'combat',
+          toId: 'discardStamina',
+          count: combatPile.cards.length,
+        });
 
         this.state = 'idle';
         return true;
       }
 
-      case ACTIONS.LOOT_SELECTION.action: {
-        const combatPile = this.getPile('combat');
-        const lootPile = this.getPile('loot');
-        for (let i in combatPile.cards) {
-          const combatCard = combatPile.cards[i];
-          if (combatCard.isLoot && combatCard.isSelected) {
-            const drawn = combatPile.draw(i);
-            if (drawn) lootPile.add(drawn);
-          }
-        }
+      // --- weapon ---
+      if (combatCard.isWeapon) {
+        const targetPile = Object.values(this.piles).find((pile) => pile.slot?.isSelected);
 
-        this.deal('combat', 'discardStamina', combatPile.cards.length);
+        if (!targetPile) return true;
+
+        // const drawn = combatPile.draw(i);
+        // if (drawn) targetPile.add(drawn);
+
+        this.deal({
+          fromId: 'combat',
+          toPile: targetPile,
+          index: i,
+        });
+
+        targetPile.slot.toggleSelected(false);
+        Object.values(this.piles).forEach((pile) => {
+          if (pile.slot?.expectsSelection) pile.slot.toggleExpectsSelection(false);
+        });
+
+        this.deal({
+          fromId: 'combat',
+          toId: 'discardStamina',
+          count: combatPile.cards.length,
+        });
 
         this.state = 'idle';
-        return true;
-      }
-
-      case ACTIONS.COMBAT.action: {
-        this.state = ACTIONS.COMBAT.action;
-        return true;
-      }
-
-      case ACTIONS.DRAW_STAMINA.action: {
-        // Move a card from playerStamina to combat
-        this.deal('playerStamina', 'combat', 1, true);
-
-        // Get sums
-        const combatSum = this.getPile('combat')?.getSum() || 0;
-        const wrathSum = this.getPile('wrath')?.getSum() || 0;
-
-        if (combatSum >= wrathSum) {
-          // Find the live enemy in wrath pile (assuming only one)
-          this.getPile('wrath').cards.forEach((card) => {
-            if (card.isEnemy && card.liveEnemy) {
-              card.defeated();
-            }
-          });
-          this.state = ACTIONS.LOOT_SELECTION.action;
-        }
-
         return true;
       }
     }
+
+    return true;
+  }
+
+  /**
+   * Enters combat state
+   * @returns {boolean}
+   */
+  handleCombat() {
+    this.state = ACTIONS.COMBAT.action;
+    return true;
+  }
+
+  /**
+   * Draws stamina into combat and resolves combat outcome
+   * @returns {boolean}
+   */
+  async handleDrawStamina() {
+    this.deal({
+      fromId: 'playerStamina',
+      toId: 'combat',
+      count: 1,
+      faceUp: true,
+    });
+
+    const combatPile = this.getPile('combat');
+    const combatSum = combatPile?.getSum() || 0;
+    const wrathSum = this.getPile('wrath')?.getSum() || 0;
+
+    if (combatSum >= wrathSum) {
+      this.getPile('wrath').cards.forEach((card) => {
+        if (card.isEnemy && card.liveEnemy) {
+          card.defeated();
+        }
+      });
+
+      setTimeout(() => {
+        if (combatPile.cards.length === 1) {
+          this.handleCardClick({ card: combatPile.cards[0], pile: combatPile, slot: combatPile.slot });
+        }
+      }, 100);
+
+      this.state = ACTIONS.LOOT_SELECTION.action;
+    }
+
+    return true;
   }
 
   /**

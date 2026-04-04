@@ -17,6 +17,8 @@ import {
   HelmetMedium,
   HelmetWeak,
 } from '~/src/components/cards/weapons';
+import { FoodExtraLarge, FoodLarge, FoodMedium, FoodSmall } from '~/src/components/cards/replenish';
+import { HealthExtraLarge, HealthLarge, HealthMedium, HealthSmall } from '~/src/components/cards/replenish';
 
 const game = {
   decks: {
@@ -28,6 +30,10 @@ const game = {
       { cardType: LootFateSmall, count: 20 },
       { cardType: LootFateMedium, count: 10 },
       { cardType: LootFateBig, count: 10 },
+      { cardType: HealthSmall, count: 20 },
+      { cardType: HealthMedium, count: 15 },
+      { cardType: HealthLarge, count: 10 },
+      { cardType: HealthExtraLarge, count: 5 },
     ],
     stamina: [
       { cardType: SwordWeak, count: 8, type: 'stamina' },
@@ -48,6 +54,10 @@ const game = {
       { cardType: LootSmall, count: 8, type: 'stamina' },
       { cardType: LootBig, count: 5, type: 'stamina' },
       { cardType: LootMedium, count: 2, type: 'stamina' },
+      { cardType: FoodSmall, count: 20 },
+      { cardType: FoodMedium, count: 15 },
+      { cardType: FoodLarge, count: 10 },
+      { cardType: FoodExtraLarge, count: 5 },
     ],
     wrath: [],
     playerStamina: [],
@@ -58,12 +68,6 @@ const game = {
       // { cardType: LootMedium, count: 3, faceUp: true },
       // { cardType: LootBig, count: 3, faceUp: true },
     ],
-    trinketLeft: [],
-    gearLeftHand: [],
-    gearHead: [],
-    gearBody: [],
-    trinketRight: [],
-    gearRightHand: [],
     discardStamina: [],
     discardFate: [],
   },
@@ -73,12 +77,31 @@ const game = {
   ],
 };
 
-const resolution = 2;
+const PLAYER_PILES = [
+  { pile: 'trinketLeft', gearType: 'trinket' },
+  { pile: 'trinketRight', gearType: 'trinket' },
+
+  { pile: 'gearLeftHand', gearType: 'hand' },
+  { pile: 'gearRightHand', gearType: 'hand' },
+
+  { pile: 'gearHead', gearType: 'helmet' },
+  { pile: 'gearBody', gearType: 'armor' },
+];
+
+const PILE_TYPE_MAP = Object.fromEntries(PLAYER_PILES.map(({ pile, gearType }) => [pile, gearType]));
+
+PLAYER_PILES.forEach(({ pile }) => {
+  game.decks[pile] = [];
+});
+
+const resolution = 3;
 
 const WIDTH = 420 * resolution;
 const HEIGHT = 240 * resolution;
 const BASEUNIT = Math.floor(HEIGHT / 40);
 const CARDWIDTH = BASEUNIT * 8;
 const CARDHEIGHT = BASEUNIT * 12;
+const AAA_SCALING = 100 / resolution;
+const FONT_FAMILY = 'verdana';
 
-export { game, WIDTH, HEIGHT, BASEUNIT, CARDWIDTH, CARDHEIGHT };
+export { game, WIDTH, HEIGHT, BASEUNIT, CARDWIDTH, CARDHEIGHT, AAA_SCALING, FONT_FAMILY, PLAYER_PILES, PILE_TYPE_MAP };

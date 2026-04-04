@@ -2,7 +2,13 @@ import * as PIXI from 'pixi.js';
 
 /**
  * @typedef {Object} Combat
- * @property {'add'|'multiply'} type - Type of modifier
+ * @property {'add'|'mult'|'sub'|'div'} type - Type of modifier
+ * @property {number} value - Value of the modifier
+ */
+
+/**
+ * @typedef {Object} Replenish
+ * @property {'fate'|'stamina'} type - Type of modifier
  * @property {number} value - Value of the modifier
  */
 
@@ -35,6 +41,7 @@ class Card {
    * @param {boolean} [params.rotated=false] - Whether the card is rotated (used for state indication).
    * @param {string} [params.graphicId=''] - Visual identifier used by renderer.
    * @param {Combat|null} [params.combat=null] - Optional combat modifier applied when card participates in combat.
+   * @param {Replenish|null} [params.replenish=null] - Optional replenish modifier applied when card replenishes player.
    * @param {string} [params.layout='none'] - Layout key used by renderer to position labels.
    * @param {boolean} [params.liveEnemy=false] - True if this card represents an active enemy.
    * @param {boolean} [params.isLoot=false] - True if this card represents loot.
@@ -49,12 +56,14 @@ class Card {
     rotated = false,
     graphicId = '',
     combat = null,
+    replenish = null,
     layout = 'none',
     lootValue = 0,
     liveEnemy = false,
     isLoot = false,
     isEnemy = false,
     isWeapon = false,
+    isReplenish = true,
   }) {
     this.id = id;
     this.type = type;
@@ -70,6 +79,8 @@ class Card {
     this.isEnemy = isEnemy;
     this.lootValue = lootValue;
     this.isWeapon = isWeapon;
+    this.isReplenish = isReplenish;
+    this.replenish = replenish;
   }
 
   /**
@@ -89,6 +100,7 @@ class Card {
     if (typeof rotated === 'boolean') this.rotated = rotated;
     else this.rotated = !this.rotated;
   }
+
   /**
    * Returns the effective value of this card for comparisons.
    *
@@ -96,11 +108,23 @@ class Card {
    */
   getValue() {
     if (this.isEnemy) {
-      return this.liveEnemy ? this.spirit : this.wrath;
-    } else if (this.isLoot) {
-      return this.isLooted ? this.lootValue : this.spirit;
+      let modifier = 0;
+      if (this.modifier?.card === this) {
+        modifier = this.modifier.amount;
+      }
+      return this.liveEnemy ? this.spirit - modifier : this.wrath;
+    } else if (this.isLoot && this.isLooted) {
+      return this.lootValue;
     } else {
-      return this.spirit;
+      let value = this.spirit;
+      if (this.modifier?.card === this) {
+        if (this.modifier.method === 'add') {
+          value += this.modifier.amount;
+        } else if (this.modifier.method === 'multiply') {
+          value *= this.modifier.amount;
+        }
+      }
+      return value;
     }
   }
 
@@ -120,6 +144,7 @@ class Card {
       //this.container.rotation = Math.PI;
       this.targetRotation = Math.PI;
       this.animateRotation();
+      this.setModifierLabel({ show: false });
     }
 
     // Optionally, you could update the card value logic automatically
@@ -208,6 +233,22 @@ class Card {
     };
 
     this.ticker.add(step);
+  }
+
+  /**
+   * Configure and show/hide the modifier label for a card
+   * @param {Object} params
+   * @param {Card} params.card - Target card
+   * @param {string} [params.text] - Text to display in the label
+   * @param {number} [params.bgColor] - Background tint color
+   * @param {boolean} [params.show] - Whether the label should be visible
+   */
+  setModifierLabel({ text, bgColor, show }) {
+    //if (!this.modifierLabel) return;
+    const label = this.modifierLabel;
+    if (typeof text === 'string') label.textObj.text = text;
+    if (typeof bgColor === 'number') label.bg.tint = bgColor;
+    if (typeof show === 'boolean') label.container.visible = show;
   }
 }
 

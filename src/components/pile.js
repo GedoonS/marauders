@@ -1,4 +1,5 @@
 import { Card } from './card.js';
+import { shuffle } from './rng.js';
 
 /**
  * Represents a collection of Card objects (deck, hand, discard, etc.)
@@ -41,10 +42,11 @@ class Pile {
   /**
    * Randomizes the order of cards in the pile
    */
-  shuffle(times = 1) {
-    for (let i = times; i > 0; i--) {
-      this.cards.sort(() => Math.random() - 0.5);
-    }
+  shuffle(times = 7) {
+    shuffle(this.cards, times);
+    // for (let i = times; i > 0; i--) {
+    //   this.cards.sort(() => Math.random() - 0.5);
+    // }
   }
   /**
    * Draws a card from the pile

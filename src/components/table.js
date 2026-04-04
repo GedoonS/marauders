@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { Slot } from './slot';
-import { BASEUNIT, CARDHEIGHT, WIDTH, HEIGHT } from './config';
+import { BASEUNIT, CARDHEIGHT, WIDTH, HEIGHT, AAA_SCALING, FONT_FAMILY, PILE_TYPE_MAP } from './config';
 
 /**
  * Represents the visual layout of piles on screen
@@ -95,7 +95,6 @@ class Table {
       y: CARDHEIGHT + 2 * BASEUNIT,
       width: centerColumnWidth,
       height: CARDHEIGHT,
-      //layout: 'evenodd',
     });
 
     this.addSlot({
@@ -106,7 +105,6 @@ class Table {
       width: topAreaHeight,
       height: CARDHEIGHT,
       rotate: true,
-      //layout: 'evenodd',
     });
 
     this.addSlot({
@@ -117,7 +115,6 @@ class Table {
       width: topAreaHeight,
       height: CARDHEIGHT,
       rotate: true,
-      //layout: 'evenodd',
     });
 
     this.addSlot({
@@ -131,34 +128,28 @@ class Table {
       reverse: true,
     });
 
-    // gearLeft: [],
-    // gearLeftHand: [],
-    // gearHead: [],
-    // gearBody: [],
-    // gearRight: [],
-    // gearRightHand: [],
+    this.addSlot({
+      id: 'trinketLeft',
+      pile: this.house.piles.trinketLeft,
+      x: centerColumnLeftSide,
+      y: topAreaHeight + 2 * BASEUNIT,
+      width: CARDHEIGHT / 2 - BASEUNIT,
+      height: CARDHEIGHT,
+      rotate: true,
+      subtypeAllowed: PILE_TYPE_MAP['trinketLeft'],
+      maxCards: 1,
+    });
 
     this.addSlot({
       id: 'gearLeftHand',
       pile: this.house.piles.gearLeftHand,
       x: centerColumnLeftSide,
-      y: topAreaHeight + 2 * BASEUNIT,
-      width: CARDHEIGHT / 2,
+      y: topAreaHeight + CARDHEIGHT / 2 + BASEUNIT,
+      width: CARDHEIGHT / 2 + BASEUNIT,
       height: CARDHEIGHT,
       rotate: true,
       subtypeAllowed: 'hand',
-      maxCards: 1,
-    });
-
-    this.addSlot({
-      id: 'trinketLeft',
-      pile: this.house.piles.trinketLeft,
-      x: centerColumnLeftSide,
-      y: topAreaHeight + CARDHEIGHT / 2 + 2 * BASEUNIT,
-      width: CARDHEIGHT / 2,
-      height: CARDHEIGHT,
-      rotate: true,
-      subtypeAllowed: 'trinket',
+      subtypeAllowed: PILE_TYPE_MAP['gearLeftHand'],
       maxCards: 1,
     });
 
@@ -167,10 +158,10 @@ class Table {
       pile: this.house.piles.gearHead,
       x: (WIDTH - CARDHEIGHT) / 2,
       y: topAreaHeight + BASEUNIT * 2,
-      width: CARDHEIGHT / 2,
+      width: CARDHEIGHT / 2 - BASEUNIT,
       height: CARDHEIGHT,
       rotate: true,
-      subtypeAllowed: 'helmet',
+      subtypeAllowed: PILE_TYPE_MAP['gearHead'],
       maxCards: 1,
     });
 
@@ -178,23 +169,11 @@ class Table {
       id: 'gearBody',
       pile: this.house.piles.gearBody,
       x: (WIDTH - CARDHEIGHT) / 2,
-      y: topAreaHeight + CARDHEIGHT / 2 + 2 * BASEUNIT,
-      width: CARDHEIGHT / 2,
+      y: topAreaHeight + CARDHEIGHT / 2 + BASEUNIT,
+      width: CARDHEIGHT / 2 + BASEUNIT,
       height: CARDHEIGHT,
       rotate: true,
-      subtypeAllowed: 'armor',
-      maxCards: 1,
-    });
-
-    this.addSlot({
-      id: 'gearRightHand',
-      pile: this.house.piles.gearRightHand,
-      x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT,
-      y: topAreaHeight + BASEUNIT * 2,
-      width: CARDHEIGHT / 2,
-      height: CARDHEIGHT,
-      rotate: true,
-      subtypeAllowed: 'hand',
+      subtypeAllowed: PILE_TYPE_MAP['gearBody'],
       maxCards: 1,
     });
 
@@ -202,11 +181,23 @@ class Table {
       id: 'trinketRight',
       pile: this.house.piles.trinketRight,
       x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT,
-      y: topAreaHeight + CARDHEIGHT / 2 + 2 * BASEUNIT,
-      width: CARDHEIGHT / 2,
+      y: topAreaHeight + BASEUNIT * 2,
+      width: CARDHEIGHT / 2 - BASEUNIT,
       height: CARDHEIGHT,
       rotate: true,
-      subtypeAllowed: 'trinket',
+      subtypeAllowed: PILE_TYPE_MAP['trinketRight'],
+      maxCards: 1,
+    });
+
+    this.addSlot({
+      id: 'gearRightHand',
+      pile: this.house.piles.gearRightHand,
+      x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT,
+      y: topAreaHeight + CARDHEIGHT / 2 + BASEUNIT,
+      width: CARDHEIGHT / 2 + BASEUNIT,
+      height: CARDHEIGHT,
+      rotate: true,
+      subtypeAllowed: PILE_TYPE_MAP['gearRightHand'],
       maxCards: 1,
     });
   }
@@ -252,14 +243,14 @@ class Table {
             .fill(0x000000)
             .stroke({ width: 2, color: 0xffffff });
 
-      const antiAntiAliasingScaling = 4;
-
       // --- Label ---
       const text = new PIXI.Text({
         text: actionObj.label,
         style: {
           fill: actionObj.message ? 0x000000 : 0xffffff,
-          fontSize: BASEUNIT * antiAntiAliasingScaling,
+          fontSize: BASEUNIT * AAA_SCALING,
+          fontFamily: FONT_FAMILY,
+          fontWeight: 'bold',
         },
       });
 
@@ -267,8 +258,8 @@ class Table {
       text.x = buttonWidth / 2;
       text.y = buttonHeight / 2;
 
-      text.scale.y = 1 / antiAntiAliasingScaling;
-      text.scale.x = 1 / antiAntiAliasingScaling;
+      text.scale.y = 1 / AAA_SCALING;
+      text.scale.x = 1 / AAA_SCALING;
 
       // --- Button container ---
       const button = new PIXI.Container();

@@ -1,8 +1,9 @@
 import * as PIXI from 'pixi.js';
-import { CARDWIDTH, BASEUNIT } from './config';
+import { CARDWIDTH, CARDHEIGHT, BASEUNIT, AAA_SCALING, FONT_FAMILY } from './config';
 import { Card } from './card';
 
 const cardBaseSize = CARDWIDTH;
+const radius = CARDWIDTH / 10;
 
 const eventEmitter = (card) => {
   const evt = new CustomEvent('game:cardPicked', {
@@ -18,7 +19,9 @@ const cardLayouts = {
   weapon: [
     { prop: 'spirit', x: 4, y: 2, rotate: 0, fontSize: 1.5 },
     { prop: 'combat.add', x: 1.4, y: 10.75, rotate: 270 },
-    { prop: 'combat.multiply', x: 1.4, y: 10.75, rotate: 270 },
+    { prop: 'combat.sub', x: 1.4, y: 10.75, rotate: 270 },
+    { prop: 'combat.div', x: 1.4, y: 10.75, rotate: 270 },
+    { prop: 'combat.mult', x: 1.4, y: 10.75, rotate: 270 },
   ],
   enemy: [
     { prop: 'spirit', x: 1.4, y: 1.2, rotate: 0 },
@@ -89,7 +92,6 @@ class CardRenderer {
       cardContainer.on('pointerdown', () => eventEmitter(card));
 
       // --- Mask ---
-      const radius = cardBaseSize / 10;
       const mask = new PIXI.Graphics().roundRect(0, 0, sprite.width, sprite.height, radius).fill(0xffffff);
 
       sprite.mask = mask;
@@ -106,7 +108,10 @@ class CardRenderer {
       cardContainer.addChild(sprite);
 
       // Print labels
-      if (card.faceUp) this.printLabels(card, cardContainer);
+      if (card.faceUp) {
+        this.printLabels(card, cardContainer);
+        this.initModifierLabel(card, cardContainer);
+      }
       // Store reference on the card
       card.container = cardContainer;
 
@@ -149,7 +154,6 @@ class CardRenderer {
 
     cardContainer.pivot.set(sprite.width / 2, sprite.height / 2);
     // --- Mask ---
-    const radius = cardBaseSize / 10;
     const mask = new PIXI.Graphics().roundRect(0, 0, sprite.width, sprite.height, radius).fill(0xffffff);
 
     sprite.mask = mask;
@@ -176,33 +180,87 @@ class CardRenderer {
    */
   printLabels(card, cardContainer) {
     const layout = cardLayouts[card.layout] ?? [];
-    const antiAntiAliasingScaling = 4;
 
     layout.forEach((item) => {
       let value = item.prop.split('.').reduce((o, k) => o?.[k], card);
       if (value === undefined) return;
 
       if (item.prop.includes('.add')) value = `+${value}`;
-      if (item.prop.includes('.multiply')) value = `×${value}`;
+      if (item.prop.includes('.sub')) value = `+${value}`;
+      if (item.prop.includes('.mult')) value = `×${value}`;
+      if (item.prop.includes('.div')) value = `×${value}`;
 
       const fontSize = (item.fontSize || 1) * BASEUNIT;
       const text = new PIXI.Text({
         text: value,
         style: {
-          fontSize: fontSize * antiAntiAliasingScaling,
+          fontSize: fontSize * AAA_SCALING,
           fill: 0xffffff,
           resolution: 1,
+          fontFamily: FONT_FAMILY,
+          fontWeight: 'bold',
         },
       });
       text.x = item.x * BASEUNIT;
       text.y = item.y * BASEUNIT;
-      text.scale.y = 1 / antiAntiAliasingScaling;
-      text.scale.x = 1 / antiAntiAliasingScaling;
+      text.scale.y = 1 / AAA_SCALING;
+      text.scale.x = 1 / AAA_SCALING;
       text.rotation = (item.rotate * Math.PI) / 180;
       text.anchor.set(0.5, 0.5);
 
       cardContainer.addChild(text);
     });
+  }
+
+  /**
+   * Initialize a modifier label slot for a card (hidden by default)
+   * @param {Card} card
+   */
+  initModifierLabel(card, cardContainer) {
+    //if (!card.container || card.modifierLabel) return;
+
+    const labelContainer = new PIXI.Container();
+    const width = (CARDWIDTH * 3) / 4;
+    const height = 2 * BASEUNIT;
+
+    const shadow = new PIXI.Graphics().roundRect(0, 0, width, height, radius).fill(0xffffff);
+    const bg = new PIXI.Graphics().roundRect(1, 1, width - 2, height - 2, radius).fill(0x555555);
+    bg.tint = 0x00ff00;
+
+    const labelText = new PIXI.Text({
+      text: '',
+      style: {
+        fontSize: BASEUNIT * AAA_SCALING,
+        fill: 0xffffff,
+        align: 'center',
+        fontWeight: 'bold',
+        fontFamily: FONT_FAMILY,
+      },
+    });
+    labelText.anchor.set(0.5, 0.5);
+    labelText.x = width / 2;
+    labelText.y = height / 2;
+
+    labelText.scale.y = 1 / AAA_SCALING;
+    labelText.scale.x = 1 / AAA_SCALING;
+
+    labelContainer.addChild(shadow);
+    labelContainer.addChild(bg);
+
+    labelContainer.addChild(labelText);
+
+    labelContainer.x = CARDWIDTH / 4;
+    labelContainer.y = CARDHEIGHT - 2 * BASEUNIT;
+
+    labelContainer.visible = false;
+
+    cardContainer.addChild(labelContainer);
+
+    card.modifierLabel = {
+      container: labelContainer,
+      textObj: labelText,
+      bg,
+    };
   }
 }
 

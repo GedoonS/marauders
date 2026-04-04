@@ -1,4 +1,5 @@
 import { Card } from './card';
+import { PLAYER_PILES } from './config';
 import { Pile } from './pile';
 import { Slot } from './slot';
 
@@ -10,6 +11,7 @@ const ACTIONS = {
   STASH_LOOT: { action: 'stash_loot', label: 'Stash Loot' },
   CONTINUE: { action: 'continue', label: 'Continue' },
   LOOT_SELECTION: { action: 'loot_selection', label: 'Select Loot', message: true },
+  DROP_LOOT: { action: 'drop_loot', label: 'Drop Loot' },
 };
 
 const STATE_ACTIONS = {
@@ -18,7 +20,7 @@ const STATE_ACTIONS = {
   combat: [ACTIONS.DRAW_STAMINA, ACTIONS.RUN],
   loot_visible: [ACTIONS.STASH_LOOT],
   enemy_defeated: [ACTIONS.CONTINUE],
-  loot_selection: [ACTIONS.LOOT_SELECTION],
+  loot_selection: [ACTIONS.LOOT_SELECTION, ACTIONS.DROP_LOOT],
 };
 
 /**
@@ -28,6 +30,7 @@ class House {
   constructor() {
     this.piles = {}; // { id: Pile }
     this.state = 'idle'; // 'idle' | 'combat' | 'loot' | etc.
+    this.applyDefenceModifier = this.applyDefenceModifier.bind(this);
   }
 
   /**
@@ -71,7 +74,7 @@ class House {
         this.piles[deckName].add(...factory.createMany({ count, type, faceUp }));
       });
 
-      this.piles[deckName].shuffle(20);
+      this.piles[deckName].shuffle();
     }
 
     for (const { from, to, count } of config.deal) {
@@ -189,23 +192,33 @@ class House {
   startAction(action) {
     switch (action) {
       case ACTIONS.RUN.action:
-        return this.handleRun();
+        this.handleRun();
+        break;
 
       case ACTIONS.DRAW_FATE.action:
-        return this.handleDrawFate();
+        this.handleDrawFate();
+        break;
 
       case ACTIONS.STASH_LOOT.action:
-        return this.handleStashLoot();
+        this.handleStashLoot();
+        break;
 
       case ACTIONS.LOOT_SELECTION.action:
-        return this.handleLootSelection();
+        this.handleLootSelection();
+        break;
+
+      case ACTIONS.DROP_LOOT.action:
+        this.handleLootDrop();
+        break;
 
       case ACTIONS.COMBAT.action:
         this.handleCombat();
 
       case ACTIONS.DRAW_STAMINA.action:
-        return this.handleDrawStamina();
+        this.handleDrawStamina();
+        break;
     }
+    this.calculateCombatModifiers();
   }
 
   /**
@@ -255,6 +268,7 @@ class House {
 
     if (this.hasLiveEnemy('wrath')) {
       this.state = 'enemy_visible';
+      this.applyDefenceModifier();
     }
 
     return true;
@@ -275,6 +289,17 @@ class House {
         this.deal({ fromId: 'wrath', toId: 'loot', index: i });
       }
     }
+
+    this.state = 'idle';
+    return true;
+  }
+
+  handleLootDrop() {
+    this.deal({
+      fromId: 'combat',
+      toId: 'discardStamina',
+      count: this.getPile('combat').cards.length,
+    });
 
     this.state = 'idle';
     return true;
@@ -371,12 +396,10 @@ class House {
       count: 1,
       faceUp: true,
     });
-
+    this.applyAttackModifiers();
     const combatPile = this.getPile('combat');
-    const combatSum = combatPile?.getSum() || 0;
-    const wrathSum = this.getPile('wrath')?.getSum() || 0;
 
-    if (combatSum >= wrathSum) {
+    if (this.isEnemyDefeated()) {
       this.getPile('wrath').cards.forEach((card) => {
         if (card.isEnemy && card.liveEnemy) {
           card.defeated();
@@ -406,6 +429,43 @@ class House {
     return pile.cards.some((card) => card.liveEnemy);
   }
 
+  combatModifiers = {
+    defenceMult: 1,
+    defenceAdd: 0,
+    attack1: null,
+    attack2: null,
+  };
+
+  /**
+   * Calculate player combatModifiers gear/trinket cards that may have combat modifiers
+   */
+  calculateCombatModifiers() {
+    const combats = [];
+
+    for (const entry of PLAYER_PILES) {
+      const pile = this.getPile(entry.pile);
+
+      if (pile?.cards?.[0]?.combat) combats.push(pile.cards[0].combat);
+    }
+
+    const attacks = [];
+    this.combatModifiers.defenceAdd = 0;
+    this.combatModifiers.defenceMult = 1;
+
+    for (const combat of combats) {
+      if (combat.sub !== undefined) {
+        this.combatModifiers.defenceAdd += combat.sub;
+      } else if (combat.div !== undefined) {
+        this.combatModifiers.defenceMult *= combat.div;
+      } else if (combat.add !== undefined || combat.mult !== undefined) {
+        attacks.push(combat);
+      }
+    }
+
+    this.combatModifiers.attack1 = attacks[0] ?? null;
+    this.combatModifiers.attack2 = attacks[1] ?? null;
+  }
+
   /**
    * Returns true if pile contains any loot
    * @param {string} pileId
@@ -415,6 +475,94 @@ class House {
     if (!pile) return false;
 
     return pile.cards.some((card) => card.isLoot);
+  }
+
+  modifiers = {};
+
+  /**
+   * Applies defence modifier to the currently visible enemy
+   */
+  applyDefenceModifier() {
+    const pile = this.getPile('wrath');
+    if (!pile) return;
+
+    const enemy = pile.cards.find((card) => card.liveEnemy);
+    if (!enemy) return;
+
+    const { defenceAdd, defenceMult } = this.combatModifiers;
+
+    const amount = (defenceAdd || 1) * (defenceMult || 1);
+    if (amount > 1) {
+      const defenceModifier = {
+        amount,
+        card: enemy,
+        labelPrefix: '-',
+        method: 'add',
+      };
+      this.modifiers.defence = defenceModifier;
+      enemy.modifier = this.modifiers.defence;
+
+      // Show the label on the enemy card. This needs to be delayed to make sure the Card gets rendered and receives the modifierLabel before calling this
+      setTimeout(() => {
+        enemy.setModifierLabel({
+          text: `def ${this.modifiers.defence.labelPrefix}${amount}`,
+          bgColor: 0xff0000,
+          show: amount > 1,
+        });
+      }, 100);
+    }
+  }
+
+  /**
+   * Applies attack modifiers to the first two cards in the combat pile
+   */
+  applyAttackModifiers() {
+    const pile = this.getPile('combat');
+    if (!pile || !pile.cards.length) return;
+
+    const { attack1, attack2 } = this.combatModifiers;
+    const attacks = [attack1, attack2];
+
+    for (let i = 0; i < attacks.length; i++) {
+      const card = pile.cards[i];
+      const attack = attacks[i];
+      if (!card || !attack) continue;
+
+      const amount = attack.add ?? attack.mult ?? 0;
+      if (amount > 1) {
+        const attackModifier = {
+          amount: amount,
+          card,
+          labelPrefix: attack.add !== undefined ? '+' : 'x',
+          method: attack.add !== undefined ? 'add' : 'multiply',
+        };
+
+        this.modifiers[`attack${i + 1}`] = attackModifier;
+
+        card.modifier = this.modifiers[`attack${i + 1}`];
+
+        // Show the label after a short delay
+        setTimeout(() => {
+          card.setModifierLabel({
+            text: `att ${attackModifier.labelPrefix}${attackModifier.amount}`,
+            bgColor: 0x00ff00, // pick color
+            show: amount > 1,
+          });
+        }, 100);
+      }
+    }
+  }
+
+  /**
+   * Checks if player defeats the enemy with current combat pile
+   * @returns {boolean} true if combatSum >= wrathSum
+   */
+  isEnemyDefeated() {
+    const combatPile = this.getPile('combat');
+    const combatSum = combatPile?.getSum() || 0;
+    const wrathSum = this.getPile('wrath')?.getSum() || 0;
+
+    return combatSum >= wrathSum;
   }
 }
 

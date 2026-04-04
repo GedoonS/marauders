@@ -1,6 +1,6 @@
 import { CardRenderer } from './card-renderer';
 import * as PIXI from 'pixi.js';
-import { CARDWIDTH, CARDHEIGHT, BASEUNIT } from './config';
+import { CARDWIDTH, CARDHEIGHT, BASEUNIT, AAA_SCALING, FONT_FAMILY } from './config';
 import { Table } from './table';
 
 const selectables = ['trinketLeft', 'gearLeftHand', 'gearHead', 'gearBody', 'trinketRight', 'gearRightHand'];
@@ -149,18 +149,19 @@ class Slot {
 
   initStatusText() {
     if (!this.statusText) {
-      const antiAntiAliasingScaling = 4;
       this.statusText = new PIXI.Text({
         text: '',
         style: {
-          fontSize: BASEUNIT * 1 * antiAntiAliasingScaling,
+          fontSize: BASEUNIT * 1 * AAA_SCALING,
           fill: 0xffffff,
           stroke: 0x000000,
+          fontFamily: FONT_FAMILY,
+          fontWeight: 'bold',
         },
       });
       this.statusText.anchor.set(0.5, 0.5); // bottom right
-      this.statusText.scale.y = 1 / antiAntiAliasingScaling;
-      this.statusText.scale.x = 1 / antiAntiAliasingScaling;
+      this.statusText.scale.y = 1 / AAA_SCALING;
+      this.statusText.scale.x = 1 / AAA_SCALING;
       if (this.rotate) {
         this.statusText.rotation -= Math.PI / 2;
         //this.container.x += CARDHEIGHT;

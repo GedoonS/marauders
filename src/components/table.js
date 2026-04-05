@@ -1,7 +1,9 @@
 import * as PIXI from 'pixi.js';
 import { Slot } from './slot';
 import { BASEUNIT, CARDHEIGHT, WIDTH, HEIGHT, AAA_SCALING, FONT_FAMILY, PILE_TYPE_MAP } from './config';
+import { InfoScreen } from './info-screen';
 
+const infoScreenVisibleStates = ['start', 'victory', 'exhausted', 'defeated'];
 /**
  * Represents the visual layout of piles on screen
  */
@@ -24,6 +26,7 @@ class Table {
     this.actionsContainer.y = BASEUNIT * 26;
     this.app.stage.addChild(this.container);
     this.cardClickListener = this.cardClickListener.bind(this);
+    this.handleInfoScreenClick = this.handleInfoScreenClick.bind(this);
     document.addEventListener('game:cardPicked', this.cardClickListener);
   }
 
@@ -200,6 +203,14 @@ class Table {
       subtypeAllowed: PILE_TYPE_MAP['gearRightHand'],
       maxCards: 1,
     });
+
+    this.infoScreen = new InfoScreen({
+      visible: false,
+      state: 'start',
+      textures: this.textures,
+      app: this.app,
+      clickHandler: this.handleInfoScreenClick,
+    });
   }
 
   /**
@@ -279,6 +290,11 @@ class Table {
       });
 
       this.actionsContainer.addChild(button);
+
+      if (infoScreenVisibleStates.includes(actionObj.action)) {
+        console.log({ actionObj });
+        this.updateInfoScreen(actionObj.data);
+      }
     });
   }
 
@@ -318,6 +334,19 @@ class Table {
     Object.values(this.slots).forEach((slot) => {
       if (slot !== ignoreSlot) slot.toggleSelected(false);
     });
+  }
+
+  updateInfoScreen(data) {
+    const infoScreenVisibility = infoScreenVisibleStates.includes(this.house.state);
+    this.infoScreen.updateVisibility(infoScreenVisibility);
+    this.infoScreen.setState({ state: this.house.state, data });
+  }
+
+  handleInfoScreenClick() {
+    const actions = this.house.getActions();
+    this.house.startAction(actions[0].action);
+    this.updateInfoScreen();
+    this.render();
   }
 }
 

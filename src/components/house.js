@@ -1,30 +1,38 @@
 import { Card } from './card';
-import { PLAYER_PILES } from './config';
+import { PLAYER_PILES, VICTORY_GEMS } from './config';
 import { Pile } from './pile';
 import { shuffle } from './rng';
 import { Slot } from './slot';
 
-const ACTIONS = {
-  DRAW_FATE: { action: 'draw_fate', label: 'Draw Fate' },
-  DRAW_STAMINA: { action: 'draw_stamina', label: 'Draw Stamina' },
-  COMBAT: { action: 'combat', label: 'Combat' },
-  RUN: { action: 'run', label: 'Run' },
-  STASH_LOOT: { action: 'stash_loot', label: 'Stash Loot' },
-  CONTINUE: { action: 'continue', label: 'Continue' },
-  LOOT_SELECTION: { action: 'loot_selection', label: 'Select Loot', message: true },
-  DROP_LOOT: { action: 'drop_loot', label: 'Drop Loot' },
-  REPLENISH: { action: 'consume_replenish', label: 'Consume' },
-};
+// const this.ACTIONS = {
+//   DRAW_FATE: { action: 'draw_fate', label: 'Draw Fate' },
+//   DRAW_STAMINA: { action: 'draw_stamina', label: 'Draw Stamina' },
+//   COMBAT: { action: 'combat', label: 'Combat' },
+//   RUN: { action: 'run', label: 'Run' },
+//   STASH_LOOT: { action: 'stash_loot', label: 'Stash Loot' },
+//   CONTINUE: { action: 'continue', label: 'Continue' },
+//   LOOT_SELECTION: { action: 'loot_selection', label: 'Select Loot', message: true },
+//   DROP_LOOT: { action: 'drop_loot', label: 'Drop Loot' },
+//   REPLENISH: { action: 'consume_replenish', label: 'Consume' },
+//   START: { action: 'start' },
+//   DEFEATED: { action: 'defeated' },
+//   EXHAUSTED: { action: 'exhausted' },
+//   VICTORY: { action: 'victory' },
+// };
 
-const STATE_ACTIONS = {
-  idle: [ACTIONS.DRAW_FATE],
-  enemy_visible: [ACTIONS.COMBAT, ACTIONS.RUN],
-  combat: [ACTIONS.DRAW_STAMINA, ACTIONS.RUN],
-  loot_visible: [ACTIONS.STASH_LOOT],
-  replenish_visible: [ACTIONS.REPLENISH],
-  enemy_defeated: [ACTIONS.CONTINUE],
-  loot_selection: [ACTIONS.LOOT_SELECTION, ACTIONS.DROP_LOOT],
-};
+// const STATE_this.ACTIONS = {
+//   start: [this.ACTIONS.START],
+//   victory: [this.ACTIONS.VICTORY],
+//   defeated: [this.ACTIONS.DEFEATED],
+//   exhausted: [this.ACTIONS.EXHAUSTED],
+//   idle: [this.ACTIONS.DRAW_FATE],
+//   enemy_visible: [this.ACTIONS.COMBAT, this.ACTIONS.RUN],
+//   combat: [this.ACTIONS.DRAW_STAMINA, this.ACTIONS.RUN],
+//   loot_visible: [this.ACTIONS.STASH_LOOT],
+//   replenish_visible: [this.ACTIONS.REPLENISH],
+//   enemy_defeated: [this.ACTIONS.CONTINUE],
+//   loot_selection: [this.ACTIONS.LOOT_SELECTION, this.ACTIONS.DROP_LOOT],
+// };
 
 /**
  * Controls game logic, piles, and flow
@@ -32,9 +40,39 @@ const STATE_ACTIONS = {
 class House {
   constructor() {
     this.piles = {}; // { id: Pile }
-    this.state = 'idle'; // 'idle' | 'combat' | 'loot' | etc.
+    this.state = 'start';
     this.applyDefenceModifier = this.applyDefenceModifier.bind(this);
   }
+
+  ACTIONS = {
+    DRAW_FATE: { action: 'draw_fate', label: 'Draw Fate' },
+    DRAW_STAMINA: { action: 'draw_stamina', label: 'Draw Stamina' },
+    COMBAT: { action: 'combat', label: 'Combat' },
+    RUN: { action: 'run', label: 'Run' },
+    STASH_LOOT: { action: 'stash_loot', label: 'Stash Loot' },
+    CONTINUE: { action: 'continue', label: 'Continue' },
+    LOOT_SELECTION: { action: 'loot_selection', label: 'Select Loot', message: true },
+    DROP_LOOT: { action: 'drop_loot', label: 'Drop Loot' },
+    REPLENISH: { action: 'consume_replenish', label: 'Consume' },
+    START: { action: 'start' },
+    DEFEATED: { action: 'defeated' },
+    EXHAUSTED: { action: 'exhausted' },
+    VICTORY: { action: 'victory' },
+  };
+
+  STATE_ACTIONS = {
+    start: [this.ACTIONS.START],
+    victory: [this.ACTIONS.VICTORY],
+    defeated: [this.ACTIONS.DEFEATED],
+    exhausted: [this.ACTIONS.EXHAUSTED],
+    idle: [this.ACTIONS.DRAW_FATE],
+    enemy_visible: [this.ACTIONS.COMBAT, this.ACTIONS.RUN],
+    combat: [this.ACTIONS.DRAW_STAMINA, this.ACTIONS.RUN],
+    loot_visible: [this.ACTIONS.STASH_LOOT],
+    replenish_visible: [this.ACTIONS.REPLENISH],
+    enemy_defeated: [this.ACTIONS.CONTINUE],
+    loot_selection: [this.ACTIONS.LOOT_SELECTION, this.ACTIONS.DROP_LOOT],
+  };
 
   /**
    * Adds a pile
@@ -140,11 +178,11 @@ class House {
   }
 
   /**
-   * Handles card click interactions based on current game state
+   * Handles card click interthis.ACTIONS based on current game state
    * @param {{card: Card, pile: Pile, slot: Slot}} context
    */
   handleCardClick(context) {
-    if ([ACTIONS.LOOT_SELECTION.action].includes(this.state)) {
+    if ([this.ACTIONS.LOOT_SELECTION.action].includes(this.state)) {
       const { card, pile, slot } = context;
 
       if (slot?.expectsSelection) {
@@ -169,10 +207,10 @@ class House {
   }
 
   /**
-   * Returns available actions based on state
+   * Returns available this.ACTIONS based on state
    */
   getActions() {
-    return STATE_ACTIONS[this.state] || [];
+    return this.STATE_ACTIONS[this.state] || [];
   }
 
   /**
@@ -182,38 +220,43 @@ class House {
    */
   startAction(action) {
     switch (action) {
-      case ACTIONS.REPLENISH.action:
+      case this.ACTIONS.START.action:
+        this.handleInfoScreenClick();
+        break;
+
+      case this.ACTIONS.REPLENISH.action:
         this.handleReplenish();
         break;
 
-      case ACTIONS.RUN.action:
+      case this.ACTIONS.RUN.action:
         this.handleRun();
         break;
 
-      case ACTIONS.DRAW_FATE.action:
+      case this.ACTIONS.DRAW_FATE.action:
         this.handleDrawFate();
         break;
 
-      case ACTIONS.STASH_LOOT.action:
+      case this.ACTIONS.STASH_LOOT.action:
         this.handleStashLoot();
         break;
 
-      case ACTIONS.LOOT_SELECTION.action:
+      case this.ACTIONS.LOOT_SELECTION.action:
         this.handleLootSelection();
         break;
 
-      case ACTIONS.DROP_LOOT.action:
+      case this.ACTIONS.DROP_LOOT.action:
         this.handleLootDrop();
         break;
 
-      case ACTIONS.COMBAT.action:
+      case this.ACTIONS.COMBAT.action:
         this.handleCombat();
 
-      case ACTIONS.DRAW_STAMINA.action:
+      case this.ACTIONS.DRAW_STAMINA.action:
         this.handleDrawStamina();
         break;
     }
     this.calculateCombatModifiers();
+    this.calculateGameState();
   }
 
   /**
@@ -276,6 +319,10 @@ class House {
     }
 
     return true;
+  }
+
+  handleInfoScreenClick() {
+    this.state = 'idle';
   }
 
   /**
@@ -433,7 +480,7 @@ class House {
    * @returns {boolean}
    */
   handleCombat() {
-    this.state = ACTIONS.COMBAT.action;
+    this.state = this.ACTIONS.COMBAT.action;
     return true;
   }
 
@@ -464,7 +511,7 @@ class House {
         }
       }, 100);
 
-      this.state = ACTIONS.LOOT_SELECTION.action;
+      this.state = this.ACTIONS.LOOT_SELECTION.action;
     }
 
     return true;
@@ -626,6 +673,27 @@ class House {
     const wrathSum = this.getPile('wrath')?.getSum() || 0;
 
     return combatSum >= wrathSum;
+  }
+
+  calculateGameState() {
+    // victory, if loot pile sum > VICTORY_GEMS
+    // exhaust if fate cards 0
+    // beaten if stamina cards 0
+    const lootSum = this.getPile('loot').getSum();
+    const fateCards = this.getPile('player-fate').cards.length;
+    const staminaCards = this.getPile('player-stamina').cards.length;
+
+    if (lootSum >= VICTORY_GEMS) {
+      this.ACTIONS.VICTORY.data = { gems: lootSum };
+      this.state = this.ACTIONS.VICTORY.action;
+    } else if (fateCards <= 0) {
+      //this.ACTIONS.VICTORY.data = { gems: lootSum };
+      this.state = this.ACTIONS.EXHAUSTED.action;
+    } else if (staminaCards <= 0) {
+      //this.ACTIONS.VICTORY.data = { gems: lootSum };
+      this.state = this.ACTIONS.DEFEATED.action;
+    }
+    console.log('state', this.state);
   }
 }
 

@@ -51,6 +51,14 @@ function next(currentValue, length = 10) {
   return nextMangled;
 }
 
+function reverse12(x) {
+  let r = 0;
+  for (let i = 0; i < 12; i++) {
+    r = (r << 1) | ((x >> i) & 1);
+  }
+  return r;
+}
+
 /**
  * Bit-manipulation function that scrambles an integer.
  * Used to generate a reproducible permutation.
@@ -59,14 +67,17 @@ function next(currentValue, length = 10) {
  * @returns {number} Mangled integer.
  */
 function mangle(x) {
-  const xorSeed = 22;
-  const xorMask = (xorSeed << 6) | (xorSeed & 0b111111);
+  const mask6 = 0b111111;
 
-  const mask = 0b111111;
-  const left = (x >> 6) & mask;
-  const right = (x & mask) << 6;
+  x = reverse12(x);
 
-  return (right | left) ^ xorMask;
+  x = ((x >> 6) & mask6) | ((x & mask6) << 6);
+
+  const seed = 14; // any 6-bit value
+  const xorMask = reverse12(seed << 6) | seed;
+  x ^= xorMask;
+
+  return x;
 }
 
 /**
@@ -95,7 +106,11 @@ function shuffle(arr, iterate = 7) {
   } while (current !== start);
 
   iterate--;
-  if (iterate > 0) shuffle(arr, iterate);
+
+  //console.log({ iterate });
+  if (iterate > 0) {
+    shuffle(arr, iterate);
+  }
 }
 
-export { feistel, unfeistel, shuffle };
+export { feistel, unfeistel, shuffle, mangle };

@@ -5,7 +5,7 @@ const demoGraphics = false;
 
 const rngTracking = {};
 
-function rollRng(category, offset = 10, range = 20) {
+function rollRng(category, offset = 10, range = 10) {
   const nextRnd = feistel(rngTracking[category] || Object.keys(rngTracking).length);
   rngTracking[category] = nextRnd;
   return offset + (nextRnd % range);

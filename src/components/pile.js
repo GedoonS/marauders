@@ -42,7 +42,7 @@ class Pile {
   /**
    * Randomizes the order of cards in the pile
    */
-  shuffle(times = 7) {
+  shuffle(times = 5) {
     shuffle(this.cards, times);
     // for (let i = times; i > 0; i--) {
     //   this.cards.sort(() => Math.random() - 0.5);

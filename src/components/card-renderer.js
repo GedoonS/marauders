@@ -18,14 +18,15 @@ const eventEmitter = (card) => {
 const cardLayouts = {
   weapon: [
     { prop: 'spirit', x: 4, y: 2, rotate: 0, fontSize: 1.5 },
-    { prop: 'combat.add', x: 1.4, y: 10.75, rotate: 270 },
-    { prop: 'combat.sub', x: 1.4, y: 10.75, rotate: 270 },
+    { prop: 'combat.add', x: 1.4, y: 10.75, rotate: 270, fontSize: 0.8 },
+    { prop: 'combat.sub', x: 1.4, y: 10.75, rotate: 270, fontSize: 0.8 },
     { prop: 'combat.div', x: 1.4, y: 10.75, rotate: 270 },
     { prop: 'combat.mult', x: 1.4, y: 10.75, rotate: 270 },
   ],
   enemy: [
     { prop: 'spirit', x: 1.4, y: 1.2, rotate: 0 },
     { prop: 'wrath', x: 6.65, y: 10.75, rotate: 180 },
+    { prop: 'wrath', x: 1, y: 10.75, rotate: 180 },
   ],
   loot: [
     { prop: 'spirit', x: 4, y: 2, rotate: 0, fontSize: 1.5 },
@@ -130,11 +131,10 @@ class CardRenderer {
     if (card.backContainer) {
       card.targetX = x;
       card.targetY = y;
-      card.animateMovement();
 
+      card.animateMovement();
       return;
     }
-
     const graphicId = `${card.type}-back`;
 
     const textureUrl = this.textures[graphicId];
@@ -151,6 +151,11 @@ class CardRenderer {
     cardContainer.x = x;
     cardContainer.y = y;
     cardContainer.eventMode = 'passive';
+
+    card.targetX = x;
+    card.targetY = y;
+    card.x = x;
+    card.y = y;
 
     cardContainer.pivot.set(sprite.width / 2, sprite.height / 2);
     // --- Mask ---

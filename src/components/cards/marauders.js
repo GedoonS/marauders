@@ -7,7 +7,7 @@ const demoGraphics = false;
 class MarauderPeasant extends CardFactory {
   identity = 'marauder-peasant';
   graphicId = demoGraphics ? 'threeoclubs' : 'peasant';
-  baseSpirit = 10;
+  baseSpirit = 30;
   layout = 'enemy';
   /**
    * Creates one or more Marauder Peasant cards.
@@ -41,19 +41,19 @@ class MarauderPeasant extends CardFactory {
 class MarauderGuard extends MarauderPeasant {
   identity = 'marauder-guard';
   graphicId = demoGraphics ? 'threeoclubs' : 'guard';
-  baseSpirit = 40;
+  baseSpirit = 50;
 }
 
 class MarauderRoyalGuard extends MarauderPeasant {
   identity = 'marauder-royal-guard';
   graphicId = demoGraphics ? 'threeoclubs' : 'royal-guard';
-  baseSpirit = 70;
+  baseSpirit = 80;
 }
 
 class MarauderPrincess extends MarauderPeasant {
   identity = 'marauder-princess';
   graphicId = demoGraphics ? 'threeoclubs' : 'princess';
-  baseSpirit = 99;
+  baseSpirit = 90;
 }
 
 export { MarauderPeasant, MarauderGuard, MarauderRoyalGuard, MarauderPrincess };

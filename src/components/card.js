@@ -1,4 +1,13 @@
 import * as PIXI from 'pixi.js';
+import { feistel, mangle } from '~/src/components/rng';
+
+let rngTracking = 127;
+let drift = 127;
+
+function rollRng() {
+  rngTracking = mangle(mangle(rngTracking) + rngTracking + drift++);
+  return rngTracking;
+}
 
 /**
  * @typedef {Object} Combat
@@ -63,7 +72,7 @@ class Card {
     isLoot = false,
     isEnemy = false,
     isWeapon = false,
-    isReplenish = true,
+    isReplenish = false,
   }) {
     this.id = id;
     this.type = type;
@@ -81,6 +90,7 @@ class Card {
     this.isWeapon = isWeapon;
     this.isReplenish = isReplenish;
     this.replenish = replenish;
+    this.pseudex = rollRng();
   }
 
   /**
@@ -195,6 +205,9 @@ class Card {
       if (this.container) {
         this.container.x = this.x;
         this.container.y = this.y;
+      } else if (this.backContainer) {
+        this.backContainer.x = this.x;
+        this.backContainer.y = this.y;
       }
       return;
     };

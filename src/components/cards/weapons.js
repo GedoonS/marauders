@@ -61,7 +61,7 @@ class SwordWeak extends GenericWeapon {
 class SwordMedium extends GenericWeapon {
   identity = 'sword-medium';
   graphicId = 'sword-medium';
-  baseValue = 2;
+  baseValue = 3;
   combatType = 'mult';
   subtype = 'hand';
 }
@@ -69,7 +69,7 @@ class SwordMedium extends GenericWeapon {
 class SwordStrong extends GenericWeapon {
   identity = 'sword-strong';
   graphicId = 'sword-strong';
-  baseValue = 3;
+  baseValue = 4;
   combatType = 'mult';
   subtype = 'hand';
 }
@@ -77,21 +77,21 @@ class SwordStrong extends GenericWeapon {
 class AxeWeak extends GenericWeapon {
   identity = 'axe-weak';
   graphicId = 'axe-weak';
-  baseValue = 2;
+  baseValue = 2 * 4;
   subtype = 'hand';
 }
 
 class AxeMedium extends GenericWeapon {
   identity = 'axe-medium';
   graphicId = 'axe-medium';
-  baseValue = 4;
+  baseValue = 4 * 4;
   subtype = 'hand';
 }
 
 class AxeStrong extends GenericWeapon {
   identity = 'axe-strong';
   graphicId = 'axe-strong';
-  baseValue = 7;
+  baseValue = 7 * 4;
   subtype = 'hand';
 }
 
@@ -122,7 +122,7 @@ class ShieldStrong extends GenericWeapon {
 class ArmorWeak extends GenericWeapon {
   identity = 'armor-weak';
   graphicId = 'armor-weak';
-  baseValue = 2;
+  baseValue = 2 * 3;
   subtype = 'armor';
   combatType = 'sub';
 }
@@ -130,7 +130,7 @@ class ArmorWeak extends GenericWeapon {
 class ArmorMedium extends GenericWeapon {
   identity = 'armor-medium';
   graphicId = 'armor-medium';
-  baseValue = 4;
+  baseValue = 4 * 3;
   subtype = 'armor';
   combatType = 'sub';
 }
@@ -138,7 +138,7 @@ class ArmorMedium extends GenericWeapon {
 class ArmorStrong extends GenericWeapon {
   identity = 'armor-strong';
   graphicId = 'armor-strong';
-  baseValue = 7;
+  baseValue = 7 * 3;
   subtype = 'armor';
   combatType = 'sub';
 }

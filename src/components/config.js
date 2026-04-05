@@ -20,48 +20,68 @@ import {
 import { FoodExtraLarge, FoodLarge, FoodMedium, FoodSmall } from '~/src/components/cards/replenish';
 import { HealthExtraLarge, HealthLarge, HealthMedium, HealthSmall } from '~/src/components/cards/replenish';
 
+// 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144
+
 const game = {
   decks: {
     fate: [
-      { cardType: MarauderPeasant, count: 40 }, // 40%
-      { cardType: MarauderGuard, count: 30 }, // 30%
-      { cardType: MarauderRoyalGuard, count: 20 }, // 20%
-      { cardType: MarauderPrincess, count: 10 }, // 10%
-      { cardType: LootFateSmall, count: 20 },
-      { cardType: LootFateMedium, count: 10 },
-      { cardType: LootFateBig, count: 10 },
-      { cardType: HealthSmall, count: 20 },
-      { cardType: HealthMedium, count: 15 },
-      { cardType: HealthLarge, count: 10 },
-      { cardType: HealthExtraLarge, count: 5 },
+      { cardType: MarauderPeasant, count: 34 }, // 40%
+      { cardType: MarauderGuard, count: 21 }, // 30%
+      { cardType: MarauderRoyalGuard, count: 13 }, // 20%
+      { cardType: MarauderPrincess, count: 8 }, // 10%
+
+      { cardType: LootFateSmall, count: 21 },
+      { cardType: LootFateMedium, count: 13 },
+      { cardType: LootFateBig, count: 8 },
+
+      { cardType: HealthSmall, count: 8 },
+      { cardType: HealthMedium, count: 5 },
+      { cardType: HealthLarge, count: 3 },
+      { cardType: HealthExtraLarge, count: 2 },
+
+      { cardType: FoodSmall, count: 13, type: 'fate' },
+      { cardType: FoodMedium, count: 8, type: 'fate' },
+      { cardType: FoodLarge, count: 5, type: 'fate' },
+      { cardType: FoodExtraLarge, count: 3, type: 'fate' },
     ],
     stamina: [
-      { cardType: SwordWeak, count: 8, type: 'stamina' },
-      { cardType: SwordMedium, count: 5, type: 'stamina' },
+      { cardType: SwordWeak, count: 5, type: 'stamina' },
+      { cardType: SwordMedium, count: 3, type: 'stamina' },
       { cardType: SwordStrong, count: 2, type: 'stamina' },
-      { cardType: AxeWeak, count: 8, type: 'stamina' },
-      { cardType: AxeMedium, count: 5, type: 'stamina' },
+
+      { cardType: AxeWeak, count: 5, type: 'stamina' },
+      { cardType: AxeMedium, count: 3, type: 'stamina' },
       { cardType: AxeStrong, count: 2, type: 'stamina' },
-      { cardType: ShieldWeak, count: 8, type: 'stamina' },
-      { cardType: ShieldMedium, count: 5, type: 'stamina' },
+
+      { cardType: ShieldWeak, count: 5, type: 'stamina' },
+      { cardType: ShieldMedium, count: 3, type: 'stamina' },
       { cardType: ShieldStrong, count: 2, type: 'stamina' },
-      { cardType: ArmorWeak, count: 8, type: 'stamina' },
-      { cardType: ArmorMedium, count: 5, type: 'stamina' },
+
+      { cardType: ArmorWeak, count: 5, type: 'stamina' },
+      { cardType: ArmorMedium, count: 3, type: 'stamina' },
       { cardType: ArmorStrong, count: 2, type: 'stamina' },
-      { cardType: HelmetWeak, count: 8, type: 'stamina' },
-      { cardType: HelmetMedium, count: 5, type: 'stamina' },
+
+      { cardType: HelmetWeak, count: 5, type: 'stamina' },
+      { cardType: HelmetMedium, count: 3, type: 'stamina' },
       { cardType: HelmetStrong, count: 2, type: 'stamina' },
+
       { cardType: LootSmall, count: 8, type: 'stamina' },
       { cardType: LootBig, count: 5, type: 'stamina' },
       { cardType: LootMedium, count: 2, type: 'stamina' },
-      { cardType: FoodSmall, count: 20 },
-      { cardType: FoodMedium, count: 15 },
-      { cardType: FoodLarge, count: 10 },
-      { cardType: FoodExtraLarge, count: 5 },
+
+      { cardType: FoodSmall, count: 8 },
+      { cardType: FoodMedium, count: 5 },
+      { cardType: FoodLarge, count: 3 },
+      { cardType: FoodExtraLarge, count: 2 },
+
+      { cardType: HealthSmall, count: 13, type: 'stamina' },
+      { cardType: HealthMedium, count: 8, type: 'stamina' },
+      { cardType: HealthLarge, count: 5, type: 'stamina' },
+      { cardType: HealthExtraLarge, count: 2, type: 'stamina' },
     ],
     wrath: [],
-    playerStamina: [],
-    playerFate: [],
+    'player-stamina': [],
+    'player-fate': [],
     combat: [],
     loot: [
       // { cardType: LootSmall, count: 3, faceUp: true },
@@ -72,8 +92,8 @@ const game = {
     discardFate: [],
   },
   deal: [
-    { from: 'fate', to: 'playerFate', count: 20 },
-    { from: 'stamina', to: 'playerStamina', count: 20 },
+    { from: 'fate', to: 'player-fate', count: 20 },
+    { from: 'stamina', to: 'player-stamina', count: 20 },
   ],
 };
 

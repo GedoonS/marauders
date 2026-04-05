@@ -1,6 +1,7 @@
 import { Card } from './card';
 import { PLAYER_PILES } from './config';
 import { Pile } from './pile';
+import { shuffle } from './rng';
 import { Slot } from './slot';
 
 const ACTIONS = {
@@ -12,6 +13,7 @@ const ACTIONS = {
   CONTINUE: { action: 'continue', label: 'Continue' },
   LOOT_SELECTION: { action: 'loot_selection', label: 'Select Loot', message: true },
   DROP_LOOT: { action: 'drop_loot', label: 'Drop Loot' },
+  REPLENISH: { action: 'consume_replenish', label: 'Consume' },
 };
 
 const STATE_ACTIONS = {
@@ -19,6 +21,7 @@ const STATE_ACTIONS = {
   enemy_visible: [ACTIONS.COMBAT, ACTIONS.RUN],
   combat: [ACTIONS.DRAW_STAMINA, ACTIONS.RUN],
   loot_visible: [ACTIONS.STASH_LOOT],
+  replenish_visible: [ACTIONS.REPLENISH],
   enemy_defeated: [ACTIONS.CONTINUE],
   loot_selection: [ACTIONS.LOOT_SELECTION, ACTIONS.DROP_LOOT],
 };
@@ -69,12 +72,15 @@ class House {
       if (!this.piles[deckName]) {
         this.piles[deckName] = new Pile({ id: deckName });
       }
+      shuffle(cardEntries, 5);
+
       cardEntries.forEach(({ cardType, count, type, faceUp }) => {
         const factory = new cardType();
         this.piles[deckName].add(...factory.createMany({ count, type, faceUp }));
       });
 
-      this.piles[deckName].shuffle();
+      // this.piles[deckName].cards = this.piles[deckName].cards.sort((a, b) => a.pseudex - b.pseudex);
+      this.piles[deckName].shuffle(17);
     }
 
     for (const { from, to, count } of config.deal) {
@@ -108,7 +114,6 @@ class House {
       if (card) {
         if (typeof faceUp === 'boolean') card.turn(faceUp);
         if (to.maxCards === to.cards.length) to.draw(0);
-
         to.add(card);
       }
 
@@ -124,20 +129,6 @@ class House {
         to.add(card);
       }
     }
-  }
-
-  /**
-   * Starts combat phase
-   */
-  startCombat() {
-    this.state = 'combat';
-  }
-
-  /**
-   * Ends combat phase
-   */
-  endCombat() {
-    this.state = 'idle';
   }
 
   /**
@@ -191,6 +182,10 @@ class House {
    */
   startAction(action) {
     switch (action) {
+      case ACTIONS.REPLENISH.action:
+        this.handleReplenish();
+        break;
+
       case ACTIONS.RUN.action:
         this.handleRun();
         break;
@@ -255,13 +250,22 @@ class House {
    */
   handleDrawFate() {
     this.deal({
-      fromId: 'playerFate',
+      fromId: 'player-fate',
       toId: 'wrath',
       count: 1,
       faceUp: true,
     });
 
-    if (this.hasLoot('wrath')) {
+    let replenishCard;
+    if ((replenishCard = this.hasReplenish('wrath', true))) {
+      setTimeout(() => (replenishCard.isSelected = true), 100);
+      this.state = 'replenish_visible';
+      return true;
+    }
+
+    let lootCard;
+    if ((lootCard = this.hasLoot('wrath', true))) {
+      setTimeout(() => (lootCard.isSelected = true), 100);
       this.state = 'loot_visible';
       return true;
     }
@@ -280,18 +284,65 @@ class House {
    */
   handleStashLoot() {
     const wrath = this.getPile('wrath');
-    const lootPile = this.getPile('loot');
 
     for (let i = wrath.cards.length - 1; i >= 0; i--) {
       const card = wrath.cards[i];
       if (card.isLoot) {
         card.looted();
+        card.isSelected = false;
         this.deal({ fromId: 'wrath', toId: 'loot', index: i });
       }
     }
 
     this.state = 'idle';
     return true;
+  }
+
+  handleReplenish() {
+    const wrath = this.getPile('wrath');
+    if (wrath.cards.some((c) => c.isReplenish)) {
+      for (let i = wrath.cards.length - 1; i >= 0; i--) {
+        const card = wrath.cards[i];
+        if (card.isReplenish) {
+          const { replenish } = card;
+
+          this.deal({
+            fromId: replenish.type,
+            toId: replenish.to,
+            count: replenish.value,
+          });
+          this.deal({
+            fromPile: wrath,
+            toId: 'discardFate',
+            index: i,
+          });
+        }
+      }
+      this.state = 'idle';
+      return true;
+    } else {
+      const combat = this.getPile('combat');
+
+      for (let i = combat.cards.length - 1; i >= 0; i--) {
+        const card = combat.cards[i];
+        if (card?.isReplenish && card?.isSelected) {
+          const { replenish } = card;
+          const deal = {
+            fromId: replenish.type,
+            toId: replenish.to,
+            count: replenish.value,
+          };
+          this.deal(deal);
+          this.deal({
+            fromPile: combat,
+            toId: 'discardStamina',
+            count: combat.cards.length,
+          });
+        }
+      }
+      this.state = 'idle';
+      return true;
+    }
   }
 
   handleLootDrop() {
@@ -313,7 +364,6 @@ class House {
    */
   handleLootSelection() {
     const combatPile = this.getPile('combat');
-    const lootPile = this.getPile('loot');
 
     if (!combatPile.cards.some((card) => card.isSelected)) return true;
 
@@ -326,6 +376,8 @@ class House {
       // --- loot ---
       if (combatCard.isLoot) {
         combatCard.looted();
+        combatCard.isSelected = false;
+
         this.deal({
           fromId: 'combat',
           toId: 'loot',
@@ -348,9 +400,6 @@ class House {
 
         if (!targetPile) return true;
 
-        // const drawn = combatPile.draw(i);
-        // if (drawn) targetPile.add(drawn);
-
         this.deal({
           fromId: 'combat',
           toPile: targetPile,
@@ -370,6 +419,9 @@ class House {
 
         this.state = 'idle';
         return true;
+      }
+      if (combatCard.isReplenish) {
+        this.handleReplenish();
       }
     }
 
@@ -391,7 +443,7 @@ class House {
    */
   async handleDrawStamina() {
     this.deal({
-      fromId: 'playerStamina',
+      fromId: 'player-stamina',
       toId: 'combat',
       count: 1,
       faceUp: true,
@@ -470,11 +522,22 @@ class House {
    * Returns true if pile contains any loot
    * @param {string} pileId
    */
-  hasLoot(pileId) {
+  hasLoot(pileId, reference = false) {
     const pile = this.getPile(pileId);
     if (!pile) return false;
 
-    return pile.cards.some((card) => card.isLoot);
+    return reference ? pile.cards.find((card) => card.isLoot) : pile.cards.some((card) => card.isLoot);
+  }
+
+  /**
+   * Returns true if pile contains any loot
+   * @param {string} pileId
+   */
+  hasReplenish(pileId, reference = false) {
+    const pile = this.getPile(pileId);
+    if (!pile) return false;
+
+    return reference ? pile.cards.find((card) => card.isReplenish) : pile.cards.some((card) => card.isReplenish);
   }
 
   modifiers = {};

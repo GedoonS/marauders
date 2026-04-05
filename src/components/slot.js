@@ -120,7 +120,7 @@ class Slot {
     const cardSpacing = Math.min(CARDWIDTH + BASEUNIT, (this.width - CARDWIDTH) / Math.max(1, this.maxCards - 1));
     for (const card of this.pile.cards) {
       const cardOffset = this.getCardPosition(index, cardSpacing);
-      await this.cardRenderer.render(card, cardOffset, 0);
+      await this.cardRenderer.render(card, cardOffset, card.faceUp ? 0 : (Math.sin(index) * BASEUNIT) / 2);
       index++;
     }
     this.renderSum();
@@ -129,7 +129,7 @@ class Slot {
   getCardPosition(index, cardSpacing) {
     const cardsAmount = this.pile.cards.length;
     if (this.layout === 'evenodd') {
-      const relativeWidth = Math.min(this.width, cardsAmount * CARDWIDTH * 0.7);
+      const relativeWidth = this.id === 'combat' ? this.width : Math.min(this.width, cardsAmount * CARDWIDTH * 0.7);
       const underWideOffset = Math.floor((this.width - relativeWidth) / 2);
       const spacing = Math.floor((relativeWidth - CARDWIDTH / 1.5) / cardsAmount);
 
@@ -144,7 +144,6 @@ class Slot {
     const underWideOffset = Math.floor((this.width - relativeWidth) / 2);
 
     return underWideOffset + Math.floor(this.reverse ? relativeWidth - CARDWIDTH - index * cardSpacing : index * cardSpacing);
-    // return Math.floor(this.reverse ? relativeWidth - CARDWIDTH - index * cardSpacing : index * cardSpacing);
   }
 
   initStatusText() {

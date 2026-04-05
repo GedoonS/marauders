@@ -98,9 +98,9 @@ class Table {
     });
 
     this.addSlot({
-      id: 'playerFate',
-      pile: this.house.piles.playerFate,
-      x: centerColumnLeftSide + centerColumnWidth + BASEUNIT * 2,
+      id: 'player-fate',
+      pile: this.house.piles['player-fate'],
+      x: centerColumnLeftSide + centerColumnWidth + BASEUNIT * 1.5,
       y: BASEUNIT,
       width: topAreaHeight,
       height: CARDHEIGHT,
@@ -108,9 +108,9 @@ class Table {
     });
 
     this.addSlot({
-      id: 'playerStamina',
-      pile: this.house.piles.playerStamina,
-      x: BASEUNIT,
+      id: 'player-stamina',
+      pile: this.house.piles['player-stamina'],
+      x: BASEUNIT * 1.5,
       y: BASEUNIT,
       width: topAreaHeight,
       height: CARDHEIGHT,

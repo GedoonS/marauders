@@ -1,38 +1,9 @@
 import { Card } from './card';
+import { CardAbacus } from './card-abacus';
 import { PLAYER_PILES, VICTORY_GEMS } from './config';
 import { Pile } from './pile';
 import { shuffle } from './rng';
 import { Slot } from './slot';
-
-// const this.ACTIONS = {
-//   DRAW_FATE: { action: 'draw_fate', label: 'Draw Fate' },
-//   DRAW_STAMINA: { action: 'draw_stamina', label: 'Draw Stamina' },
-//   COMBAT: { action: 'combat', label: 'Combat' },
-//   RUN: { action: 'run', label: 'Run' },
-//   STASH_LOOT: { action: 'stash_loot', label: 'Stash Loot' },
-//   CONTINUE: { action: 'continue', label: 'Continue' },
-//   LOOT_SELECTION: { action: 'loot_selection', label: 'Select Loot', message: true },
-//   DROP_LOOT: { action: 'drop_loot', label: 'Drop Loot' },
-//   REPLENISH: { action: 'consume_replenish', label: 'Consume' },
-//   START: { action: 'start' },
-//   DEFEATED: { action: 'defeated' },
-//   EXHAUSTED: { action: 'exhausted' },
-//   VICTORY: { action: 'victory' },
-// };
-
-// const STATE_this.ACTIONS = {
-//   start: [this.ACTIONS.START],
-//   victory: [this.ACTIONS.VICTORY],
-//   defeated: [this.ACTIONS.DEFEATED],
-//   exhausted: [this.ACTIONS.EXHAUSTED],
-//   idle: [this.ACTIONS.DRAW_FATE],
-//   enemy_visible: [this.ACTIONS.COMBAT, this.ACTIONS.RUN],
-//   combat: [this.ACTIONS.DRAW_STAMINA, this.ACTIONS.RUN],
-//   loot_visible: [this.ACTIONS.STASH_LOOT],
-//   replenish_visible: [this.ACTIONS.REPLENISH],
-//   enemy_defeated: [this.ACTIONS.CONTINUE],
-//   loot_selection: [this.ACTIONS.LOOT_SELECTION, this.ACTIONS.DROP_LOOT],
-// };
 
 /**
  * Controls game logic, piles, and flow
@@ -117,7 +88,7 @@ class House {
         this.piles[deckName].add(...factory.createMany({ count, type, faceUp }));
       });
 
-      //this.piles[deckName].cards = this.piles[deckName].cards.sort((a, b) => a.pseudex - b.pseudex);
+      this.piles[deckName].cards = this.piles[deckName].cards.sort((a, b) => a.pseudex - b.pseudex);
       this.piles[deckName].shuffle(13);
     }
 
@@ -257,6 +228,7 @@ class House {
     }
     this.calculateCombatModifiers();
     this.calculateGameState();
+    this.displayDigit();
   }
 
   /**
@@ -301,14 +273,16 @@ class House {
 
     let replenishCard;
     if ((replenishCard = this.hasReplenish('wrath', true))) {
-      setTimeout(() => (replenishCard.isSelected = true), 100);
+      //setTimeout(() => (replenishCard.isSelected = true), 100);
+      replenishCard.isSelected;
       this.state = 'replenish_visible';
       return true;
     }
 
     let lootCard;
     if ((lootCard = this.hasLoot('wrath', true))) {
-      setTimeout(() => (lootCard.isSelected = true), 100);
+      //setTimeout(() => (lootCard.isSelected = true), 100);
+      lootCard.isSelected;
       this.state = 'loot_visible';
       return true;
     }
@@ -503,9 +477,10 @@ class House {
     const combatPile = this.getPile('combat');
 
     if (this.isEnemyDefeated()) {
-      this.getPile('wrath').cards.forEach((card) => {
+      this.getPile('wrath').cards.forEach((card, index) => {
         if (card.isEnemy && card.liveEnemy) {
           card.defeated();
+          this.deal({ fromId: 'wrath', toId: 'discardWrath', index });
         }
       });
 
@@ -676,28 +651,64 @@ class House {
     const combatSum = combatPile?.getSum() || 0;
     const wrathSum = this.getPile('wrath')?.getSum() || 0;
 
-    return combatSum >= wrathSum;
+    return combatSum >= wrathSum + this.abacusValue;
   }
 
   calculateGameState() {
-    // victory, if loot pile sum > VICTORY_GEMS
-    // exhaust if fate cards 0
-    // beaten if stamina cards 0
+    const discardWrath = this.getPile('discardWrath').getSum();
+
     const lootSum = this.getPile('loot').getSum();
     const fateCards = this.getPile('player-fate').cards.length;
     const staminaCards = this.getPile('player-stamina').cards.length;
+
+    this.abacusValue = discardWrath;
+    this.getPile('I').slot.overrideSum = discardWrath;
+    this.getPile('wrath').slot.overrideSum = discardWrath + this.getPile('wrath').getSum();
 
     if (lootSum >= VICTORY_GEMS) {
       this.ACTIONS.VICTORY.data = { gems: lootSum };
       this.state = this.ACTIONS.VICTORY.action;
     } else if (fateCards <= 0) {
-      //this.ACTIONS.VICTORY.data = { gems: lootSum };
       this.state = this.ACTIONS.EXHAUSTED.action;
     } else if (staminaCards <= 0) {
-      //this.ACTIONS.VICTORY.data = { gems: lootSum };
       this.state = this.ACTIONS.DEFEATED.action;
     }
-    console.log('state', this.state);
+  }
+
+  cardAbacus = new CardAbacus();
+
+  abacusValue = 0;
+
+  displayDigit() {
+    const operations = this.cardAbacus.update(this.abacusValue);
+    for (let { pile, count, type } of operations) {
+      const targetPile = this.getPile(pile);
+      const discard = `${pile}discard`;
+      this.getPile(discard).cards.forEach((card) => {
+        card.isSelected = false;
+        card.rotation = 0;
+      });
+
+      switch (type) {
+        case 'add_I':
+          this.deal({ fromId: `${pile}discard`, toPile: targetPile, count });
+          break;
+        case 'sub_I':
+          this.deal({ toId: `${pile}discard`, fromPile: targetPile, count });
+          break;
+        case 'add_V':
+          this.deal({ fromId: `${pile}discard`, toPile: targetPile, count });
+          targetPile.cards[0].isSelected = true;
+          break;
+        case 'sub_V':
+          const selectedCard = targetPile.cards.find((card) => card.isSelected);
+          this.deal({ toId: `${pile}discard`, fromPile: targetPile, index: selectedCard });
+          targetPile.cards.forEach((card) => {
+            card.isSelected = false;
+          });
+          break;
+      }
+    }
   }
 }
 

@@ -26,7 +26,7 @@ const cardLayouts = {
   enemy: [
     { prop: 'spirit', x: 1.4, y: 1.2, rotate: 0 },
     { prop: 'wrath', x: 6.65, y: 10.75, rotate: 180 },
-    { prop: 'wrath', x: 1, y: 10.75, rotate: 180 },
+    // { prop: 'wrath', x: 1, y: 10.75, rotate: 180 },
   ],
   loot: [
     { prop: 'spirit', x: 4, y: 2, rotate: 0, fontSize: 1.5 },
@@ -117,6 +117,7 @@ class CardRenderer {
       card.container = cardContainer;
 
       this.container.addChild(cardContainer);
+      card.animateAlpha();
     } else {
       await this.renderCardBack(card, x, y);
     }
@@ -150,8 +151,9 @@ class CardRenderer {
     const cardContainer = new PIXI.Container();
     cardContainer.x = x;
     cardContainer.y = y;
+    cardContainer.rotation = card.targetRotation;
     cardContainer.eventMode = 'passive';
-
+    card.rotation = card.targetRotation;
     card.targetX = x;
     card.targetY = y;
     card.x = x;
@@ -174,6 +176,7 @@ class CardRenderer {
 
     // Store reference on the card
     card.backContainer = cardContainer;
+    card.animateAlpha();
 
     this.container.addChild(cardContainer);
   }
@@ -190,12 +193,16 @@ class CardRenderer {
       let value = item.prop.split('.').reduce((o, k) => o?.[k], card);
       if (value === undefined) return;
 
+      const domain = Math.floor(Math.log10(value));
+      let fontScale = 1;
+      if (domain > 1) fontScale = 0.8;
+
       if (item.prop.includes('.add')) value = `+${value}`;
       if (item.prop.includes('.sub')) value = `+${value}`;
       if (item.prop.includes('.mult')) value = `×${value}`;
       if (item.prop.includes('.div')) value = `×${value}`;
 
-      const fontSize = (item.fontSize || 1) * BASEUNIT;
+      const fontSize = (item.fontSize || 1) * BASEUNIT * fontScale;
       const text = new PIXI.Text({
         text: value,
         style: {

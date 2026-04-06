@@ -75,6 +75,8 @@ class Slot {
     // Create a container for this slot
     this.parentContainer = parentContainer;
     this.container = new PIXI.Container();
+
+    this.container.visible = false;
     this.container.x = x + CARDWIDTH / 2;
     this.container.y = y + CARDHEIGHT / 2;
     if (this.rotate) {
@@ -115,21 +117,24 @@ class Slot {
   }
 
   async render() {
-    this.maxCards = Math.max(this.maxCards, this.pile.cards.length);
+    this.maxCardsInPile = Math.max(this.maxCardsInPile ?? 0, this.pile.cards.length);
     let index = 0;
-    const cardSpacing = Math.min(CARDWIDTH + BASEUNIT, (this.width - CARDWIDTH) / Math.max(1, this.maxCards - 1));
+    const cardSpacing = Math.min(CARDWIDTH + BASEUNIT, (this.width - CARDWIDTH) / Math.max(1, this.maxCardsInPile - 1));
+
+    const snaking = ['player-fate', 'player-stamina'].includes(this.id);
     for (const card of this.pile.cards) {
       const cardOffset = this.getCardPosition(index, cardSpacing);
-      await this.cardRenderer.render(card, cardOffset, card.faceUp ? 0 : (Math.sin(index) * BASEUNIT) / 2);
+
+      await this.cardRenderer.render(card, cardOffset, snaking ? (Math.sin(index) * BASEUNIT) / 2 : 0);
       index++;
     }
     this.renderSum();
   }
 
   getCardPosition(index, cardSpacing) {
-    const cardsAmount = this.pile.cards.length;
+    const cardsAmount = ['I', 'X', 'C'].includes(this.id) ? 5 : this.pile.cards.length;
     if (this.layout === 'evenodd') {
-      const relativeWidth = this.id === 'combat' ? this.width : Math.min(this.width, cardsAmount * CARDWIDTH * 0.7);
+      const relativeWidth = ['combat'].includes(this.id) ? this.width : Math.min(this.width, cardsAmount * CARDWIDTH * 0.7);
       const underWideOffset = Math.floor((this.width - relativeWidth) / 2);
       const spacing = Math.floor((relativeWidth - CARDWIDTH / 1.5) / cardsAmount);
 
@@ -176,9 +181,9 @@ class Slot {
   }
 
   renderSum() {
-    if (['wrath', 'combat', 'loot'].includes(this.id)) {
+    if (['wrath', 'combat', 'loot', 'I'].includes(this.id)) {
       // --- Draw pile sum in lower right corner ---
-      const sum = this.pile.getSum();
+      const sum = this.overrideSum ?? this.pile.getSum();
       this.statusText.text = sum;
       this.statusText.alpha = sum > 0 ? 1 : 0;
     }

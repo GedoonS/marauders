@@ -90,6 +90,13 @@ const game = {
     ],
     discardStamina: [],
     discardFate: [],
+    discardWrath: [],
+    I: [],
+    C: [],
+    X: [],
+    Idiscard: [{ cardType: MarauderPeasant, count: 5 }],
+    Cdiscard: [{ cardType: MarauderPeasant, count: 5 }],
+    Xdiscard: [{ cardType: MarauderPeasant, count: 5 }],
   },
   deal: [
     { from: 'fate', to: 'player-fate', count: 20 },

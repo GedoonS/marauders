@@ -1,13 +1,17 @@
 import { Card } from '~/src/components/card';
 import { CardFactory } from './card-factory';
 const demoGraphics = false;
+
+// 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144
+// 100 50 30 20
+
 /**
  * Factory for generating Marauder cards.
  */
 class MarauderPeasant extends CardFactory {
   identity = 'marauder-peasant';
   graphicId = demoGraphics ? 'threeoclubs' : 'peasant';
-  baseSpirit = 30;
+  baseSpirit = 20;
   layout = 'enemy';
   /**
    * Creates one or more Marauder Peasant cards.
@@ -41,19 +45,19 @@ class MarauderPeasant extends CardFactory {
 class MarauderGuard extends MarauderPeasant {
   identity = 'marauder-guard';
   graphicId = demoGraphics ? 'threeoclubs' : 'guard';
-  baseSpirit = 50;
+  baseSpirit = 30;
 }
 
 class MarauderRoyalGuard extends MarauderPeasant {
   identity = 'marauder-royal-guard';
   graphicId = demoGraphics ? 'threeoclubs' : 'royal-guard';
-  baseSpirit = 80;
+  baseSpirit = 50;
 }
 
 class MarauderPrincess extends MarauderPeasant {
   identity = 'marauder-princess';
   graphicId = demoGraphics ? 'threeoclubs' : 'princess';
-  baseSpirit = 90;
+  baseSpirit = 100;
 }
 
 export { MarauderPeasant, MarauderGuard, MarauderRoyalGuard, MarauderPrincess };

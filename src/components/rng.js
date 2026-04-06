@@ -107,7 +107,6 @@ function shuffle(arr, iterate = 7) {
 
   iterate--;
 
-  //console.log({ iterate });
   if (iterate > 0) {
     shuffle(arr, iterate);
   }

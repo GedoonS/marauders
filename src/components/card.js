@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { feistel, mangle } from '~/src/components/rng';
 
 let rngTracking = 127;
-let drift = 127;
+let drift = 127 + (Date.now() % 100);
 
 function rollRng() {
   rngTracking = mangle(mangle(rngTracking) + rngTracking + drift++);
@@ -77,7 +77,7 @@ class Card {
     this.id = id;
     this.type = type;
     this.spirit = Math.ceil(spirit / 5) * 5;
-    this.wrath = Math.ceil(wrath / 5) * 5;
+    this.wrath = wrath;
     this.faceUp = faceUp;
     this.rotated = rotated;
     this.graphicId = graphicId;
@@ -170,13 +170,25 @@ class Card {
   }
 
   set isSelected(value) {
-    console.log(this.container);
     this.isSelectedState = Boolean(value);
-    if (this.container) {
-      //this.container.rotation = this.isSelectedState ? Math.PI / 2 : 0;
-      this.targetRotation = this.isSelectedState ? Math.PI / 2 : 0;
-      this.animateRotation();
-    }
+
+    this.targetRotation = this.isSelectedState ? Math.PI / 2 : 0;
+    this.animateRotation();
+  }
+
+  get isTilted() {
+    return this.isTiltedState;
+  }
+
+  set isTilted(value) {
+    this.isTiltedState = Boolean(value);
+    this.targetRotation = this.isTiltedState ? Math.PI / 9 : 0;
+
+    this.animateRotation();
+  }
+
+  resetTilt() {
+    this.rotation = 0;
   }
 
   /**
@@ -226,11 +238,12 @@ class Card {
     const step = () => {
       const diff = this.targetRotation - this.rotation;
 
-      // close enough → snap and stop
       if (Math.abs(diff) < 0.01) {
         this.rotation = this.targetRotation;
         if (this.container) {
           this.container.rotation = this.rotation;
+        } else if (this.backContainer) {
+          this.backContainer.rotation = this.rotation;
         }
 
         this.ticker.remove(step);
@@ -238,11 +251,14 @@ class Card {
         return;
       }
 
-      // move toward target
-      this.rotation += diff * speed;
-
       if (this.container) {
+        // move toward target
+        this.rotation += diff * speed;
         this.container.rotation = this.rotation;
+      } else if (this.backContainer) {
+        // move toward target
+        this.rotation += diff * speed;
+        this.backContainer.rotation = this.rotation;
       }
     };
 
@@ -263,6 +279,36 @@ class Card {
     if (typeof text === 'string') label.textObj.text = text;
     if (typeof bgColor === 'number') label.bg.tint = bgColor;
     if (typeof show === 'boolean') label.container.visible = show;
+  }
+
+  animateAlpha() {
+    if (this.isFading) return;
+
+    const speed = 0.05;
+    const target = 1;
+
+    const container = this.container ?? this.backContainer;
+    container.alpha = 0;
+
+    const step = () => {
+      const diff = target - container.alpha;
+      container.alpha += diff * speed;
+
+      if (Math.abs(diff) < 0.01) {
+        container.alpha = target;
+
+        if (target === 0) {
+          container.visible = false;
+        }
+
+        this.ticker.remove(step);
+        this.isFading = false;
+        return;
+      }
+    };
+
+    this.isFading = true;
+    this.ticker.add(step);
   }
 }
 

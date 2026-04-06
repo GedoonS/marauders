@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { Slot } from './slot';
-import { BASEUNIT, CARDHEIGHT, WIDTH, HEIGHT, AAA_SCALING, FONT_FAMILY, PILE_TYPE_MAP } from './config';
+import { BASEUNIT, CARDHEIGHT, WIDTH, HEIGHT, AAA_SCALING, FONT_FAMILY, PILE_TYPE_MAP, CARDWIDTH } from './config';
 import { InfoScreen } from './info-screen';
 
 const infoScreenVisibleStates = ['start', 'victory', 'exhausted', 'defeated'];
@@ -21,6 +21,7 @@ class Table {
 
     // Container just for action buttons
     this.actionsContainer = new PIXI.Container();
+    this.actionsContainer.visible = false;
     this.container.addChild(this.actionsContainer);
     this.actionsContainer.x = BASEUNIT * 56;
     this.actionsContainer.y = BASEUNIT * 26;
@@ -81,14 +82,16 @@ class Table {
     const centerColumnWidth = Math.floor((WIDTH - (6 * BASEUNIT + 2 * CARDHEIGHT)) / BASEUNIT) * BASEUNIT;
     const centerColumnLeftSide = CARDHEIGHT + 3 * BASEUNIT;
 
+    this.constructCounters();
+
     this.addSlot({
       id: 'wrath',
       pile: this.house.piles.wrath,
-      x: centerColumnLeftSide,
+      x: centerColumnLeftSide + centerColumnWidth - CARDWIDTH,
       y: BASEUNIT,
-      width: centerColumnWidth,
+      width: CARDWIDTH,
       height: CARDHEIGHT,
-      layout: 'evenodd',
+      //layout: 'evenodd',
     });
 
     this.addSlot({
@@ -128,7 +131,7 @@ class Table {
       width: CARDHEIGHT,
       height: CARDHEIGHT,
       rotate: true,
-      reverse: true,
+      //reverse: true,
     });
 
     this.addSlot({
@@ -211,6 +214,49 @@ class Table {
       app: this.app,
       clickHandler: this.handleInfoScreenClick,
     });
+
+    setTimeout(() => {
+      Object.values(this.slots).forEach((slot) => (slot.container.visible = true));
+      this.actionsContainer.visible = true;
+    }, 1000);
+  }
+
+  /**
+   * Constructs and lays out all slots on the table
+   */
+  constructCounters() {
+    const centerColumnLeftSide = CARDHEIGHT + 3 * BASEUNIT;
+
+    const commonWidth = CARDHEIGHT - BASEUNIT * 2.3333;
+
+    const xLeft = centerColumnLeftSide;
+
+    this.addSlot({
+      id: 'C',
+      pile: this.house.piles.C,
+      x: xLeft,
+      y: BASEUNIT,
+      width: commonWidth,
+      height: CARDHEIGHT,
+    });
+
+    this.addSlot({
+      id: 'X',
+      pile: this.house.piles.X,
+      x: xLeft + (commonWidth + BASEUNIT),
+      y: BASEUNIT,
+      width: commonWidth,
+      height: CARDHEIGHT,
+    });
+
+    this.addSlot({
+      id: 'I',
+      pile: this.house.piles.I,
+      x: xLeft + (commonWidth + BASEUNIT) * 2,
+      y: BASEUNIT,
+      width: commonWidth,
+      height: CARDHEIGHT,
+    });
   }
 
   /**
@@ -292,7 +338,6 @@ class Table {
       this.actionsContainer.addChild(button);
 
       if (infoScreenVisibleStates.includes(actionObj.action)) {
-        console.log({ actionObj });
         this.updateInfoScreen(actionObj.data);
       }
     });
@@ -338,8 +383,8 @@ class Table {
 
   updateInfoScreen(data) {
     const infoScreenVisibility = infoScreenVisibleStates.includes(this.house.state);
-    this.infoScreen.updateVisibility(infoScreenVisibility);
-    this.infoScreen.setState({ state: this.house.state, data });
+    this.infoScreen?.updateVisibility(infoScreenVisibility);
+    this.infoScreen?.setState({ state: this.house.state, data });
   }
 
   handleInfoScreenClick() {

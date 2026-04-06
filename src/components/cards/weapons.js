@@ -77,21 +77,21 @@ class SwordStrong extends GenericWeapon {
 class AxeWeak extends GenericWeapon {
   identity = 'axe-weak';
   graphicId = 'axe-weak';
-  baseValue = 2 * 4;
+  baseValue = 2 * 5;
   subtype = 'hand';
 }
 
 class AxeMedium extends GenericWeapon {
   identity = 'axe-medium';
   graphicId = 'axe-medium';
-  baseValue = 4 * 4;
+  baseValue = 4 * 5;
   subtype = 'hand';
 }
 
 class AxeStrong extends GenericWeapon {
   identity = 'axe-strong';
   graphicId = 'axe-strong';
-  baseValue = 7 * 4;
+  baseValue = 8 * 5;
   subtype = 'hand';
 }
 

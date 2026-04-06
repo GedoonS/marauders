@@ -4,7 +4,7 @@
   "description": "virtual card game",
   "scripts": {
     "start": "parcel public/index.html --open",
-    "build": "parcel build public/index.html",
+    "build": "parcel build public/index.html --dist-dir docs --public-url ./",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

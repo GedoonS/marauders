@@ -76,8 +76,8 @@ class Card {
   }) {
     this.id = id;
     this.type = type;
-    this.spirit = spirit;
-    this.wrath = wrath;
+    this.spirit = Math.ceil(spirit / 5) * 5;
+    this.wrath = Math.ceil(wrath / 5) * 5;
     this.faceUp = faceUp;
     this.rotated = rotated;
     this.graphicId = graphicId;
@@ -170,6 +170,7 @@ class Card {
   }
 
   set isSelected(value) {
+    console.log(this.container);
     this.isSelectedState = Boolean(value);
     if (this.container) {
       //this.container.rotation = this.isSelectedState ? Math.PI / 2 : 0;

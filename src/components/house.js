@@ -191,6 +191,12 @@ class House {
    */
   startAction(action) {
     switch (action) {
+      case this.ACTIONS.EXHAUSTED.action:
+      case this.ACTIONS.DEFEATED.action:
+      case this.ACTIONS.VICTORY.action:
+        this.state = 'end';
+        return;
+
       case this.ACTIONS.START.action:
         this.handleInfoScreenClick();
         break;

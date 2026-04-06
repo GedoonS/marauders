@@ -117,8 +117,8 @@ class House {
         this.piles[deckName].add(...factory.createMany({ count, type, faceUp }));
       });
 
-      // this.piles[deckName].cards = this.piles[deckName].cards.sort((a, b) => a.pseudex - b.pseudex);
-      this.piles[deckName].shuffle(17);
+      //this.piles[deckName].cards = this.piles[deckName].cards.sort((a, b) => a.pseudex - b.pseudex);
+      this.piles[deckName].shuffle(13);
     }
 
     for (const { from, to, count } of config.deal) {
@@ -397,6 +397,10 @@ class House {
       fromId: 'combat',
       toId: 'discardStamina',
       count: this.getPile('combat').cards.length,
+    });
+
+    Object.values(this.piles).forEach((pile) => {
+      if (pile.slot?.expectsSelection) pile.slot.toggleExpectsSelection(false);
     });
 
     this.state = 'idle';

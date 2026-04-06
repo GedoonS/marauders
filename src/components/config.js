@@ -25,10 +25,10 @@ import { HealthExtraLarge, HealthLarge, HealthMedium, HealthSmall } from '~/src/
 const game = {
   decks: {
     fate: [
-      { cardType: MarauderPeasant, count: 34 }, // 40%
-      { cardType: MarauderGuard, count: 21 }, // 30%
-      { cardType: MarauderRoyalGuard, count: 13 }, // 20%
-      { cardType: MarauderPrincess, count: 8 }, // 10%
+      { cardType: MarauderPeasant, count: 34 },
+      { cardType: MarauderGuard, count: 21 },
+      { cardType: MarauderRoyalGuard, count: 13 },
+      { cardType: MarauderPrincess, count: 8 },
 
       { cardType: LootFateSmall, count: 21 },
       { cardType: LootFateMedium, count: 13 },

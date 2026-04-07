@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import * as textures from 'url:/static/*.png';
+import * as textures from 'url:/static/noai/*.png';
 
 import { game } from '~/src/components/config';
 import { House } from '~/src/components/house';

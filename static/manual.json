@@ -1,0 +1,72 @@
+[
+  {
+    "title": "The Goal",
+    "text": "You are a fierce fairy warrior, champion of your village. The evil marauder insects have stolen your people's Luxurium, and you descend into their lair to recover it.\n\nExplore the lair, survive encounters, and reclaim what was taken. Each step deeper draws a Fate card. Push your luck, grow stronger, and avoid running out of Fury.",
+    "image": "game-start"
+  },
+  {
+    "title": "Fate Pile",
+    "text": "Each turn you push deeper into the marauders' burrow, entering a new cavity. A Fate card reveals what lurks within - enemies, stolen Luxurium, or a moment of respite. The number of cards in your Fate pile reflects the energy you have to continue your search.",
+    "image": "fate-back",
+    "class": "manual-sideways"
+  },
+  {
+    "title": "Fury Pile",
+    "text": "Fury is your health & fighting spirit in combat. Fury cards are spent in combat to attack the enemy. If your Fury runs out, you lose.",
+    "image": "stamina-back",
+    "class": "manual-sideways"
+  },
+  {
+    "title": "Enemies",
+    "text": "Upon entering a cavity, you may encounter an enemy. Enemies come in different sizes and strengths. If a foe seems too formidable or your health is low, you may choose to run to safety. Defeating enemies adds to the Lair's Wrath, making future encounters even more dangerous.",
+    "image": "guard",
+    "class": "manual-image-crop"
+  },
+  {
+    "title": "Enemy Types",
+    "text": "Most common encounters are Peasants, not very capable fighters. Guards are stronger and more dangerous. Royal Guards are heavy elite fighters. Princesses are rare and extremely powerful.",
+    "image": "royal-guard",
+    "class": "manual-image-crop"
+  },
+  {
+    "title": "Wrath",
+    "text": "Wrath is the Lair's global difficulty counter. Each defeated enemy adds to it, making future foes stronger. Wrath is tallied using cards beside the enemy slot: upright cards count as 1, and sideways cards count as 5.",
+    "image": "fate-back",
+    "class": "manual-sideways"
+  },
+  {
+    "title": "Passive Gear",
+    "text": "After an enemy has been defeated, you may recover combat gear from the cavity, perhaps lost by an adventurer before you.\n\nArmor, helmets and shields apply automatically at the start of combat. They reduce enemy strength before you spend any Fury. You can equip one helmet and one body armour. You can carry a shield in either hand.",
+    "image": "armor-medium",
+    "class": "manual-sideways"
+  },
+  {
+    "title": "Active Gear",
+    "text": "Weapons modify your Fury cards. They can add extra damage or multiply it. You choose which weapons to equip in either hand, as you find those after enemy encounters. Swords akimbo, double axes? Choose your weapons wisely.",
+    "image": "sword-medium",
+    "class": "manual-sideways"
+  },
+  {
+    "title": "Food",
+    "text": "Food restores your strength to keep advancing. Use it to dig deeper in the lair. Exhausting yourself ends your venture, so be sure to keep your energy level up.",
+    "image": "food-medium",
+    "class": "manual-sideways"
+  },
+  {
+    "title": "Health",
+    "text": "Health is measured by your Fury pile. If you run out, the run ends. You may find medicine bundles or revitalising tinctures that replenish cards in your Fury pile.",
+    "image": "health-medium",
+    "class": "manual-sideways"
+  },
+  {
+    "title": "Luxurium",
+    "text": "Luxurium is a rare and coveted magical gemstone, shimmering with amber, amethyst, and opal hues. Its true power is not revealed to strangers, but its loss has plunged the village into misfortune.\n\nCollect %VICTORY_GEMS%  Luxurium to restore what was stolen from the village elders and achieve victory",
+    "image": "luxurium-medium",
+    "class": "manual-sideways"
+  },
+  {
+    "title": "Endings",
+    "text": "Your run can end in different ways. Victory, exhaustion, or defeat depending on how far you make it.",
+    "image": "game-end-victory"
+  }
+]

@@ -16,8 +16,8 @@ class House {
   }
 
   ACTIONS = {
-    DRAW_FATE: { action: 'draw_fate', label: 'Draw Fate' },
-    DRAW_STAMINA: { action: 'draw_stamina', label: 'Draw Stamina' },
+    DRAW_FATE: { action: 'draw_fate', label: 'Advance' },
+    DRAW_STAMINA: { action: 'draw_stamina', label: 'Attack' },
     COMBAT: { action: 'combat', label: 'Combat' },
     RUN: { action: 'run', label: 'Run' },
     STASH_LOOT: { action: 'stash_loot', label: 'Stash Loot' },

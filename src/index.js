@@ -4,6 +4,7 @@ import * as textures from 'url:/static/*.png';
 import { game } from '~/src/components/config';
 import { House } from '~/src/components/house';
 import { Table } from '~/src/components/table';
+import { ManualMaker } from '~/src/components/manual-maker';
 import { CARDHEIGHT, CARDWIDTH, BASEUNIT, WIDTH, HEIGHT } from './components/config';
 
 const width = WIDTH;
@@ -42,7 +43,8 @@ async function main() {
   });
 
   document.body.appendChild(app.canvas);
-
+  const manual = new ManualMaker({ textures });
+  manual.render();
   // drawGrid(app, width, height, BASEUNIT, 0x999999);
   // drawGrid(app, width, height, BASEUNIT * 2, 0xffffff);
 
@@ -52,23 +54,7 @@ async function main() {
   const table = new Table({ app, textures, house });
   table.constructTable();
 
-  // Game loop
-  let elapsed = 0;
-  let dealt = 0;
-  const maxCards = 16;
-  const delay = 400; // ms
-
   table.render();
-
-  // app.ticker.add((ticker) => {
-  //   if (dealt >= maxCards) return;
-  //   elapsed += ticker.deltaMS;
-  //   if (elapsed >= delay) {
-  //     elapsed = 0;
-  //     table.render();
-  //     dealt++;
-  //   }
-  // });
 }
 
 main();

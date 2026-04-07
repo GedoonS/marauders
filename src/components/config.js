@@ -30,19 +30,19 @@ const game = {
       { cardType: MarauderRoyalGuard, count: 13 },
       { cardType: MarauderPrincess, count: 8 },
 
-      { cardType: LootFateSmall, count: 21 },
-      { cardType: LootFateMedium, count: 13 },
-      { cardType: LootFateBig, count: 8 },
+      { cardType: LootFateSmall, count: 13 },
+      { cardType: LootFateMedium, count: 8 },
+      { cardType: LootFateBig, count: 5 },
 
       { cardType: HealthSmall, count: 8 },
       { cardType: HealthMedium, count: 5 },
       { cardType: HealthLarge, count: 3 },
       { cardType: HealthExtraLarge, count: 2 },
 
-      { cardType: FoodSmall, count: 13, type: 'fate' },
-      { cardType: FoodMedium, count: 8, type: 'fate' },
-      { cardType: FoodLarge, count: 5, type: 'fate' },
-      { cardType: FoodExtraLarge, count: 3, type: 'fate' },
+      { cardType: FoodSmall, count: 8, type: 'fate' },
+      { cardType: FoodMedium, count: 5, type: 'fate' },
+      { cardType: FoodLarge, count: 3, type: 'fate' },
+      { cardType: FoodExtraLarge, count: 2, type: 'fate' },
     ],
     stamina: [
       { cardType: SwordWeak, count: 5, type: 'stamina' },
@@ -77,7 +77,7 @@ const game = {
       { cardType: HealthSmall, count: 13, type: 'stamina' },
       { cardType: HealthMedium, count: 8, type: 'stamina' },
       { cardType: HealthLarge, count: 5, type: 'stamina' },
-      { cardType: HealthExtraLarge, count: 2, type: 'stamina' },
+      { cardType: HealthExtraLarge, count: 3, type: 'stamina' },
     ],
     wrath: [],
     'player-stamina': [],
@@ -130,7 +130,7 @@ const CARDWIDTH = BASEUNIT * 8;
 const CARDHEIGHT = BASEUNIT * 12;
 const AAA_SCALING = 100 / resolution;
 const FONT_FAMILY = 'verdana';
-const VICTORY_GEMS = 100;
+const VICTORY_GEMS = 137; //100;
 
 export {
   //

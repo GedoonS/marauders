@@ -53,15 +53,15 @@ class GenericWeapon extends CardFactory {
 class SwordWeak extends GenericWeapon {
   identity = 'sword-weak';
   graphicId = 'sword-weak';
-  baseValue = 2;
-  combatType = 'mult';
+  baseValue = 2 * 5;
+  //combatType = 'mult';
   subtype = 'hand';
 }
 
 class SwordMedium extends GenericWeapon {
   identity = 'sword-medium';
   graphicId = 'sword-medium';
-  baseValue = 3;
+  baseValue = 2;
   combatType = 'mult';
   subtype = 'hand';
 }
@@ -69,7 +69,7 @@ class SwordMedium extends GenericWeapon {
 class SwordStrong extends GenericWeapon {
   identity = 'sword-strong';
   graphicId = 'sword-strong';
-  baseValue = 4;
+  baseValue = 3;
   combatType = 'mult';
   subtype = 'hand';
 }
@@ -98,7 +98,7 @@ class AxeStrong extends GenericWeapon {
 class ShieldWeak extends GenericWeapon {
   identity = 'shield-weak';
   graphicId = 'shield-weak';
-  baseValue = 1 * 5;
+  baseValue = 3;
   subtype = 'hand';
   combatType = 'sub';
 }
@@ -106,7 +106,7 @@ class ShieldWeak extends GenericWeapon {
 class ShieldMedium extends GenericWeapon {
   identity = 'shield-medium';
   graphicId = 'shield-medium';
-  baseValue = 2 * 5;
+  baseValue = 5;
   subtype = 'hand';
   combatType = 'sub';
 }
@@ -114,7 +114,7 @@ class ShieldMedium extends GenericWeapon {
 class ShieldStrong extends GenericWeapon {
   identity = 'shield-strong';
   graphicId = 'shield-strong';
-  baseValue = 3 * 5;
+  baseValue = 10;
   subtype = 'hand';
   combatType = 'sub';
 }
@@ -146,15 +146,15 @@ class ArmorStrong extends GenericWeapon {
 class HelmetWeak extends GenericWeapon {
   identity = 'helmet-weak';
   graphicId = 'helmet-weak';
-  baseValue = 2;
+  baseValue = 2 * 10;
   subtype = 'helmet';
-  combatType = 'div';
+  combatType = 'sub';
 }
 
 class HelmetMedium extends GenericWeapon {
   identity = 'helmet-medium';
   graphicId = 'helmet-medium';
-  baseValue = 3;
+  baseValue = 2;
   subtype = 'helmet';
   combatType = 'div';
 }
@@ -162,7 +162,7 @@ class HelmetMedium extends GenericWeapon {
 class HelmetStrong extends GenericWeapon {
   identity = 'helmet-strong';
   graphicId = 'helmet-strong';
-  baseValue = 4;
+  baseValue = 3;
   subtype = 'helmet';
   combatType = 'div';
 }

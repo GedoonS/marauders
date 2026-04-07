@@ -83,10 +83,13 @@ class House {
       }
       shuffle(cardEntries, 5);
 
-      cardEntries.forEach(({ cardType, count, type, faceUp }) => {
-        const factory = new cardType();
-        this.piles[deckName].add(...factory.createMany({ count, type, faceUp }));
-      });
+      const maxDecks = ['fate', 'stamina'].includes(deckName) ? 3 : 1;
+      for (let loop = 0; loop < maxDecks; loop++) {
+        cardEntries.forEach(({ cardType, count, type, faceUp }) => {
+          const factory = new cardType();
+          this.piles[deckName].add(...factory.createMany({ count, type, faceUp }));
+        });
+      }
 
       this.piles[deckName].cards = this.piles[deckName].cards.sort((a, b) => a.pseudex - b.pseudex);
       this.piles[deckName].shuffle(13);
@@ -280,7 +283,7 @@ class House {
     let replenishCard;
     if ((replenishCard = this.hasReplenish('wrath', true))) {
       //setTimeout(() => (replenishCard.isSelected = true), 100);
-      replenishCard.isSelected;
+      replenishCard.isSelected = true;
       this.state = 'replenish_visible';
       return true;
     }
@@ -288,7 +291,7 @@ class House {
     let lootCard;
     if ((lootCard = this.hasLoot('wrath', true))) {
       //setTimeout(() => (lootCard.isSelected = true), 100);
-      lootCard.isSelected;
+      lootCard.isSelected = true;
       this.state = 'loot_visible';
       return true;
     }

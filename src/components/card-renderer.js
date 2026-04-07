@@ -18,14 +18,14 @@ const eventEmitter = (card) => {
 const cardLayouts = {
   weapon: [
     { prop: 'spirit', x: 4, y: 2, rotate: 0, fontSize: 1.5 },
-    { prop: 'combat.add', x: 1.4, y: 10.75, rotate: 270, fontSize: 0.8 },
-    { prop: 'combat.sub', x: 1.4, y: 10.75, rotate: 270, fontSize: 0.8 },
-    { prop: 'combat.div', x: 1.4, y: 10.75, rotate: 270 },
-    { prop: 'combat.mult', x: 1.4, y: 10.75, rotate: 270 },
+    { prop: 'combat.add', x: 1.3, y: 10.75, rotate: 270, fontSize: 0.8 },
+    { prop: 'combat.sub', x: 1.3, y: 10.75, rotate: 270, fontSize: 0.8 },
+    { prop: 'combat.div', x: 1.3, y: 10.75, rotate: 270 },
+    { prop: 'combat.mult', x: 1.3, y: 10.75, rotate: 270 },
   ],
   enemy: [
     { prop: 'spirit', x: 1.4, y: 1.2, rotate: 0 },
-    { prop: 'wrath', x: 6.65, y: 10.75, rotate: 180 },
+    //{ prop: 'wrath', x: 6.65, y: 10.75, rotate: 180 },
     // { prop: 'wrath', x: 1, y: 10.75, rotate: 180 },
   ],
   loot: [

@@ -285,12 +285,12 @@ class Table {
     const actions = this.house.getActions();
 
     const buttonWidth = CARDHEIGHT;
-    const buttonHeight = 2 * BASEUNIT;
+    const buttonHeight = 5.5 * BASEUNIT;
     const gap = BASEUNIT;
 
     actions.forEach((actionObj, index) => {
       const x = BASEUNIT;
-      const y = buttonHeight - BASEUNIT + index * (buttonHeight + gap);
+      const y = BASEUNIT + index * (buttonHeight + gap);
 
       // --- Button background ---
       const bg = actionObj.message

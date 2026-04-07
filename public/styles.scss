@@ -7,12 +7,12 @@ body {
   box-sizing: border-box;
   width: 100%;
   min-height: 100%;
-  //overflow: hidden;
   background-color: #000;
 }
 
 $aspect-ratio: math.div(420, 240);
 canvas {
+  margin-top: 4rem;
   display: block;
   margin-inline: auto;
   aspect-ratio: $aspect-ratio;

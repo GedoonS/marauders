@@ -152,7 +152,7 @@ class InfoScreen {
       start: {
         texture: this.textures['game-start'],
         heading: 'Welcome, warrior',
-        text: `The marauders have stolen ${VICTORY_GEMS} precious Luxurium gems. Your mission: enter their lair, fight the enemies, and recover them all. Every step is a challenge. Let no monster stand in your way.\n\nmanual\n⌄`,
+        text: `The marauders have stolen ${VICTORY_GEMS} precious Luxurium gems. Your mission: enter their lair, fight the enemies, and recover them all. Every step is a challenge. Let no monster stand in your way.\n\nClick to start ◇ Scroll for manual`,
       },
       victory: {
         texture: this.textures['game-end-victory'],

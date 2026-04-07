@@ -1,11 +1,14 @@
 import * as PIXI from 'pixi.js';
-import * as textures from 'url:/static/noai/*.png';
+import { textures } from '~/src/components/textures';
+import { textures as noAiTextures } from '~/src/components/textures';
+
+const texturePack = process.env.NOAI ? noAiTextures : textures;
 
 import { game } from '~/src/components/config';
 import { House } from '~/src/components/house';
 import { Table } from '~/src/components/table';
 import { ManualMaker } from '~/src/components/manual-maker';
-import { CARDHEIGHT, CARDWIDTH, BASEUNIT, WIDTH, HEIGHT } from './components/config';
+import { BASEUNIT, WIDTH, HEIGHT } from './components/config';
 
 const width = WIDTH;
 const height = HEIGHT;
@@ -51,7 +54,7 @@ async function main() {
   const house = new House();
 
   house.buildDecks(game);
-  const table = new Table({ app, textures, house });
+  const table = new Table({ app, textures: texturePack, house });
   table.constructTable();
 
   table.render();

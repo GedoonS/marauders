@@ -157,17 +157,17 @@ class InfoScreen {
       victory: {
         texture: this.textures['game-end-victory'],
         heading: 'Triumph!',
-        text: 'You recovered %gems% Luxurium gems. Your village will celebrate your bravery, and the tales of your deeds will echo through the halls for generations.',
+        text: 'You recovered %gems% Luxurium gems. Your village will celebrate your bravery, and the tales of your deeds will echo through the halls for generations.\n\nRefresh for new game.',
       },
       exhausted: {
         texture: this.textures['game-end-exhausted'],
         heading: 'Exhausted!',
-        text: 'You tried your best, but your Stamina has run out. You barely made it out of the lair, bruised and weary, yet wiser for the experience. Rest, prepare, and return stronger.',
+        text: 'You tried your best, but your Stamina has run out. You barely made it out of the lair, bruised and weary, yet wiser for the experience. Rest, prepare, and return stronger.\n\nRefresh for new game.',
       },
       defeated: {
         texture: this.textures['game-end-beaten'],
         heading: 'Defeated!',
-        text: 'You fought bravely, but the last enemy was too strong. Overcome and unconscious, you were dragged from the lair. Recover, warrior—your quest is not yet finished.',
+        text: 'You fought bravely, but the last enemy was too strong. Overcome and unconscious, you were dragged from the lair. Recover, warrior—your quest is not yet finished.\n\nRefresh for new game.',
       },
     };
 

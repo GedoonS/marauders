@@ -37,7 +37,7 @@ jobs:
       # Build NO_AI version
       - name: Build no-AI version
         run: |
-          NO_AI=1 parcel build public/index.html \
+          NOAI=1 parcel build public/index.html \
             --no-source-maps \
             --dist-dir dist-noai \
             --public-url ./

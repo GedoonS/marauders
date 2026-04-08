@@ -239,7 +239,7 @@ class House {
     this.calculateCombatModifiers();
     this.calculateGameState();
     this.displayDigit();
-    this.doHouseChorse();
+    this.doHouseChores();
   }
 
   /**
@@ -249,14 +249,14 @@ class House {
    * (fate and stamina). If a discard pile has grown larger than
    * its draw pile, it is reshuffled back into the draw pile.
    */
-  doHouseChorse() {
+  doHouseChores() {
     const dealerDecks = [
       ['discardFate', 'fate'],
       ['discardStamina', 'stamina'],
     ];
 
     dealerDecks.forEach(([pile, to]) => {
-      if (this.getPile(pile).cards.length > this.getPile(pile, to).cards.length) {
+      if (this.getPile(pile).cards.length > this.getPile(to).cards.length) {
         this.reshuffle(pile, to);
       }
     });

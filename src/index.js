@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { textures } from '~/src/components/textures';
-import { textures as noAiTextures } from '~/src/components/textures';
+import { textures as noAiTextures } from '~/src/components/textures-noai';
 
 const texturePack = process.env.NOAI ? noAiTextures : textures;
 

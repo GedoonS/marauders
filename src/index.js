@@ -46,7 +46,7 @@ async function main() {
   });
 
   document.body.appendChild(app.canvas);
-  const manual = new ManualMaker({ textures });
+  const manual = new ManualMaker({ textures: texturePack });
   manual.render();
   // drawGrid(app, width, height, BASEUNIT, 0x999999);
   // drawGrid(app, width, height, BASEUNIT * 2, 0xffffff);

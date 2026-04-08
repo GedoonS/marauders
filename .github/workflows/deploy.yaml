@@ -23,21 +23,42 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
+      - name: Install
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      # Build normal version
+      - name: Build default
+        run: |
+          parcel build public/index.html \
+            --no-source-maps \
+            --dist-dir dist \
+            --public-url ./
+
+      # Build NO_AI version
+      - name: Build no-AI version
+        run: |
+          NO_AI=1 parcel build public/index.html \
+            --no-source-maps \
+            --dist-dir dist-noai \
+            --public-url ./
+
+      # Combine outputs
+      - name: Combine builds
+        run: |
+          mkdir final
+          cp -r dist/* final/
+          mkdir -p final/noai
+          cp -r dist-noai/* final/noai/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist # or ./build depending on your setup
+          path: ./final
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         uses: actions/deploy-pages@v4

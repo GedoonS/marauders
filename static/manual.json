@@ -30,7 +30,7 @@
   },
   {
     "title": "Wrath",
-    "text": "Wrath is the Lair's global difficulty counter. Each defeated enemy adds to it, making future foes stronger. Wrath is tallied using cards beside the enemy slot: upright cards count as 1, and sideways cards count as 5.",
+    "text": "Wrath is the Lair's global difficulty counter. Each defeated enemy adds to it, making future foes stronger. Wrath is tallied using cards beside the enemy slot: upright cards count as 1, and sideways cards count as 5. First pile on the left denotes 100's, second denotes 10's and the last one denotes ones.",
     "image": "fate-back",
     "class": "manual-sideways"
   },

@@ -242,17 +242,36 @@ class House {
     this.doHouseChorse();
   }
 
+  /**
+   * Performs end-of-round maintenance for card piles.
+   *
+   * Checks discard piles against their corresponding draw piles
+   * (fate and stamina). If a discard pile has grown larger than
+   * its draw pile, it is reshuffled back into the draw pile.
+   */
   doHouseChorse() {
-    [
+    const dealerDecks = [
       ['discardFate', 'fate'],
       ['discardStamina', 'stamina'],
-    ].forEach(([pile, to]) => {
+    ];
+
+    dealerDecks.forEach(([pile, to]) => {
       if (this.getPile(pile).cards.length > this.getPile(pile, to).cards.length) {
         this.reshuffle(pile, to);
       }
     });
   }
 
+  /**
+   * Moves all cards from one pile to another after shuffling.
+   *
+   * The source pile is shuffled, and all its cards are
+   * transferred to the bottom of the target pile.
+   * Used to recycle discard piles back into draw piles.
+   *
+   * @param {string} from - Key of the source pile (e.g. 'discardFate').
+   * @param {string} to - Key of the target pile (e.g. 'fate').
+   */
   reshuffle(from, to) {
     const fromPile = this.getPile(from);
     const toPile = this.getPile(to);

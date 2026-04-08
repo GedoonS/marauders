@@ -7,17 +7,9 @@ const selectables = ['trinketLeft', 'gearLeftHand', 'gearHead', 'gearBody', 'tri
 class Slot {
   maxCards = 0;
   isSelected = false;
-
   ticker = PIXI.Ticker.shared;
 
   alphaAnimation = {
-    // target: 0.5,
-    // isAnimating: false,
-    // direction: 1, // 1 = increasing, -1 = decreasing
-    // min: 0.3,
-    // max: 0.7,
-    // speed: 0.003,
-
     counter: 0,
     isAnimating: false,
     speed: 0.03, // tweak to make it faster or slower
@@ -36,6 +28,7 @@ class Slot {
    * @param {PIXI.app} params.app - parent app
    * @param {string|null} [params.subtypeAllowed=null] - Accepted subtypes for this pile (for example 'hand', 'helmet'
    * @param {Table} params.table
+   * @param {boolean} snaking - whether to stagger the pile or not
    */
   constructor({
     id,
@@ -53,6 +46,8 @@ class Slot {
     table,
     subtypeAllowed = null,
     maxCards = -1,
+    snaking,
+    defaultCardsLength,
   }) {
     this.id = id;
     this.x = x;
@@ -67,6 +62,8 @@ class Slot {
     this.table = table;
     this.subtypeAllowed = subtypeAllowed;
     this.maxCards = maxCards;
+    this.snaking = snaking;
+    if (defaultCardsLength) this.maxCardsInPile = defaultCardsLength;
 
     this.pile.setParentSlot(this);
     if (subtypeAllowed) this.pile.setSubtypeAllowed(subtypeAllowed);
@@ -121,11 +118,10 @@ class Slot {
     let index = 0;
     const cardSpacing = Math.min(CARDWIDTH + BASEUNIT, (this.width - CARDWIDTH) / Math.max(1, this.maxCardsInPile - 1));
 
-    const snaking = ['player-fate', 'player-stamina', 'loot'].includes(this.id);
     for (const card of this.pile.cards) {
       const cardOffset = this.getCardPosition(index, cardSpacing);
 
-      await this.cardRenderer.render(card, cardOffset, snaking ? (Math.sin(index) * BASEUNIT) / 2 : 0);
+      await this.cardRenderer.render(card, cardOffset, this.snaking ? (Math.sin(index) * BASEUNIT) / 2 : 0);
       index++;
     }
     this.renderSum();
@@ -144,7 +140,7 @@ class Slot {
         return underWideOffset + relativeWidth - CARDWIDTH - spacing * ((index - 1) / 2) + Math.floor(BASEUNIT / 2);
       }
     }
-    const relativeWidth = Math.min(this.width, cardsAmount * CARDWIDTH);
+    const relativeWidth = this.snaking ? this.width : Math.min(this.width, cardsAmount * CARDWIDTH);
 
     const underWideOffset = Math.floor((this.width - relativeWidth) / 2);
 

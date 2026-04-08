@@ -34,33 +34,17 @@ class Table {
   /**
    * Adds a slot to the table
    * @param {Object} params
-   * @param {string} params.id
-   * @param {number} params.x
-   * @param {number} params.y
-   * @param {number} params.width
-   * @param {number} params.height
-   * @param {'fan'|'singles'} params.layout
    */
-  addSlot({ id, x, y, width, height, layout = 'fan', pile, rotate = false, reverse = false, subtypeAllowed = null, maxCards = -1 }) {
+  addSlot(params) {
     const slot = new Slot({
-      id,
-      x,
-      y,
-      width,
-      height,
-      layout,
       parentContainer: this.container,
       textures: this.textures,
-      pile,
-      rotate,
-      reverse,
       app: this.app,
       table: this,
-      subtypeAllowed,
-      maxCards,
+      ...params,
     });
 
-    this.slots[id] = slot;
+    this.slots[params.id] = slot;
   }
 
   /**
@@ -112,6 +96,7 @@ class Table {
       height: CARDHEIGHT,
       rotate: true,
       reverse: true,
+      snaking: true,
     });
 
     this.addSlot({
@@ -123,6 +108,7 @@ class Table {
       height: CARDHEIGHT,
       rotate: true,
       reverse: true,
+      snaking: true,
     });
 
     this.addSlot({
@@ -134,6 +120,8 @@ class Table {
       height: CARDHEIGHT,
       rotate: true,
       reverse: true,
+      snaking: true,
+      defaultCardsLength: 5,
     });
 
     this.addSlot({

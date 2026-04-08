@@ -5,6 +5,7 @@ import { Pile } from './pile';
 import { shuffle } from './rng';
 import { Slot } from './slot';
 
+const shuffleTimes = 13;
 /**
  * Controls game logic, piles, and flow
  */
@@ -83,7 +84,7 @@ class House {
       }
       shuffle(cardEntries, 5);
 
-      const maxDecks = ['fate', 'stamina'].includes(deckName) ? 3 : 1;
+      const maxDecks = /*['fate', 'stamina'].includes(deckName) ? 3 :*/ 1;
       for (let loop = 0; loop < maxDecks; loop++) {
         cardEntries.forEach(({ cardType, count, type, faceUp }) => {
           const factory = new cardType();
@@ -92,7 +93,7 @@ class House {
       }
 
       this.piles[deckName].cards = this.piles[deckName].cards.sort((a, b) => a.pseudex - b.pseudex);
-      this.piles[deckName].shuffle(13);
+      this.piles[deckName].shuffle(shuffleTimes);
     }
 
     for (const { from, to, count } of config.deal) {
@@ -238,6 +239,28 @@ class House {
     this.calculateCombatModifiers();
     this.calculateGameState();
     this.displayDigit();
+    this.doHouseChorse();
+  }
+
+  doHouseChorse() {
+    [
+      ['discardFate', 'fate'],
+      ['discardStamina', 'stamina'],
+    ].forEach(([pile, to]) => {
+      if (this.getPile(pile).cards.length > this.getPile(pile, to).cards.length) {
+        this.reshuffle(pile, to);
+      }
+    });
+  }
+
+  reshuffle(from, to) {
+    const fromPile = this.getPile(from);
+    const toPile = this.getPile(to);
+    fromPile.shuffle(shuffleTimes);
+    for (let i = fromPile.cards.length; i > 0; i--) {
+      const card = fromPile.draw();
+      toPile.addToBottom(card);
+    }
   }
 
   /**
@@ -489,7 +512,8 @@ class House {
       this.getPile('wrath').cards.forEach((card, index) => {
         if (card.isEnemy && card.liveEnemy) {
           card.defeated();
-          this.deal({ fromId: 'wrath', toId: 'discardWrath', index });
+          this.deal({ fromId: 'wrath', toId: 'discardFate', index });
+          this.accumulatedWrath += card.getValue();
         }
       });
 
@@ -660,19 +684,16 @@ class House {
     const combatSum = combatPile?.getSum() || 0;
     const wrathSum = this.getPile('wrath')?.getSum() || 0;
 
-    return combatSum >= wrathSum + this.abacusValue;
+    return combatSum >= wrathSum + this.accumulatedWrath;
   }
 
   calculateGameState() {
-    const discardWrath = this.getPile('discardWrath').getSum();
-
     const lootSum = this.getPile('loot').getSum();
     const fateCards = this.getPile('player-fate').cards.length;
     const staminaCards = this.getPile('player-stamina').cards.length;
 
-    this.abacusValue = discardWrath;
-    this.getPile('I').slot.overrideSum = discardWrath;
-    this.getPile('wrath').slot.overrideSum = discardWrath + this.getPile('wrath').getSum();
+    this.getPile('I').slot.overrideSum = this.accumulatedWrath;
+    this.getPile('wrath').slot.overrideSum = this.accumulatedWrath + this.getPile('wrath').getSum();
 
     if (lootSum >= VICTORY_GEMS) {
       this.ACTIONS.VICTORY.data = { gems: lootSum };
@@ -686,10 +707,10 @@ class House {
 
   cardAbacus = new CardAbacus();
 
-  abacusValue = 0;
+  accumulatedWrath = 0;
 
   displayDigit() {
-    const operations = this.cardAbacus.update(this.abacusValue);
+    const operations = this.cardAbacus.update(this.accumulatedWrath);
     for (let { pile, count, type } of operations) {
       const targetPile = this.getPile(pile);
       const discard = `${pile}discard`;

@@ -121,7 +121,7 @@ class Slot {
     let index = 0;
     const cardSpacing = Math.min(CARDWIDTH + BASEUNIT, (this.width - CARDWIDTH) / Math.max(1, this.maxCardsInPile - 1));
 
-    const snaking = ['player-fate', 'player-stamina'].includes(this.id);
+    const snaking = ['player-fate', 'player-stamina', 'loot'].includes(this.id);
     for (const card of this.pile.cards) {
       const cardOffset = this.getCardPosition(index, cardSpacing);
 

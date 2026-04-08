@@ -84,6 +84,14 @@ class Pile {
   }
 
   /**
+   * Adds one or more cards to the bottom of the pile
+   * @param {...Card} cards - Cards to add
+   */
+  addToBottom(...cards) {
+    this.cards.unshift(...cards);
+  }
+
+  /**
    * Initializes the pile with a new set of cards
    * @param {Card[]} cards - Cards to populate the pile with
    */

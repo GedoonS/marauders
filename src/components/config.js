@@ -90,7 +90,6 @@ const game = {
     ],
     discardStamina: [],
     discardFate: [],
-    discardWrath: [],
     I: [],
     C: [],
     X: [],

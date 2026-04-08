@@ -111,6 +111,7 @@ class Table {
       width: topAreaHeight,
       height: CARDHEIGHT,
       rotate: true,
+      reverse: true,
     });
 
     this.addSlot({
@@ -121,6 +122,7 @@ class Table {
       width: topAreaHeight,
       height: CARDHEIGHT,
       rotate: true,
+      reverse: true,
     });
 
     this.addSlot({
@@ -131,7 +133,7 @@ class Table {
       width: CARDHEIGHT,
       height: CARDHEIGHT,
       rotate: true,
-      //reverse: true,
+      reverse: true,
     });
 
     this.addSlot({

@@ -1,7 +1,7 @@
 import { WIDTH, HEIGHT, AAA_SCALING as AAA_SCALING_original, BASEUNIT, FONT_FAMILY, VICTORY_GEMS } from './config';
 import * as PIXI from 'pixi.js';
 
-const AAA_SCALING = AAA_SCALING_original / 4;
+const AAA_SCALING = AAA_SCALING_original / 2;
 /**
  * Info screen controller for Pixi (start / ending screens).
  * Owns a container and manages its content + visibility.
@@ -50,6 +50,7 @@ class InfoScreen {
           width: (BASEUNIT / 8) * AAA_SCALING,
           color: 0x000000,
           alignment: 0,
+          join: 'round',
         },
       },
       layout: {
@@ -83,6 +84,7 @@ class InfoScreen {
           width: ((BASEUNIT / 3) * AAA_SCALING) / paragraphScaling,
           color: 0x000000,
           alignment: 0,
+          join: 'round',
         },
       },
     });
@@ -152,7 +154,7 @@ class InfoScreen {
       start: {
         texture: this.textures['game-start'],
         heading: 'Welcome, warrior',
-        text: `The marauders have stolen ${VICTORY_GEMS} precious Luxurium gems. Your mission: enter their lair, fight the enemies, and recover them all. Every step is a challenge. Let no monster stand in your way.\n\nClick to start ⛬ Scroll for manual`,
+        text: `The marauders have stolen ${VICTORY_GEMS} precious Luxurium gems. Your mission: enter their lair, fight the enemies, and recover them all. Every step is a challenge. Let no monster stand in your way.\n\nClick to start ☆ Scroll for manual`,
       },
       victory: {
         texture: this.textures['game-end-victory'],

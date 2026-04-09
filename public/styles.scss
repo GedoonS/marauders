@@ -28,6 +28,18 @@ $border-color: #111;
 $border-radius: 0.5rem;
 $border-shorty: 0.5rem solid $border-color;
 
+#loading {
+  max-width: 40rem;
+  margin: 50vh auto;
+  color: #ddd;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+
+  &.hidden {
+    display: none;
+  }
+}
+
 .manual {
   max-width: 40rem;
   margin: 4rem auto;

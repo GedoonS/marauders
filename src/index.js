@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { textures } from '~/src/components/textures';
 import { textures as noAiTextures } from '~/src/components/textures-noai';
 
-const texturePack = process.env.NOAI ? noAiTextures : textures;
+const texturePackObject = process.env.NOAI ? noAiTextures : textures;
 
 import { game } from '~/src/components/config';
 import { House } from '~/src/components/house';
@@ -44,6 +44,11 @@ async function main() {
     backgroundColor: 0x000000,
     antialias: false,
   });
+
+  // Preload all the graphics
+  PIXI.Assets.addBundle('texturePack', texturePackObject);
+  const texturePack = await PIXI.Assets.loadBundle('texturePack');
+  document.querySelector('#loading').classList.add('hidden');
 
   document.body.appendChild(app.canvas);
   const manual = new ManualMaker({ textures: texturePack });

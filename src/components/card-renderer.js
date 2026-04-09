@@ -68,10 +68,9 @@ class CardRenderer {
 
       const graphicId = card.faceUp ? card.graphicId : `${card.type}-back`;
 
-      const textureUrl = this.textures[graphicId];
-      if (!textureUrl) return;
+      const texture = this.textures[graphicId];
+      if (!texture) return;
 
-      const texture = await PIXI.Assets.load(textureUrl);
       const sprite = new PIXI.Sprite(texture);
 
       sprite.width = Math.floor(cardBaseSize);
@@ -143,10 +142,9 @@ class CardRenderer {
     }
     const graphicId = `${card.type}-back`;
 
-    const textureUrl = this.textures[graphicId];
-    if (!textureUrl) return;
+    const texture = this.textures[graphicId];
+    if (!texture) return;
 
-    const texture = await PIXI.Assets.load(textureUrl);
     const sprite = new PIXI.Sprite(texture);
 
     sprite.width = Math.floor(cardBaseSize);

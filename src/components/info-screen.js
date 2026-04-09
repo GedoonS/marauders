@@ -188,7 +188,7 @@ class InfoScreen {
       });
     }
 
-    this.sprite.texture = await PIXI.Assets.load(texture);
+    this.sprite.texture = texture;
     this.heading.text = heading;
     this.text.text = text;
 

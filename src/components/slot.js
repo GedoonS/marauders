@@ -196,7 +196,7 @@ class Slot {
     //if (this.isSelected) this.toggleExpectsSelection(false);
     if (this.outline) {
       setTimeout(() => {
-        this.outline.alpha = this.isSelected ? 1 : 0.1;
+        this.outline.alpha = this.isSelected ? 0.7 : 0.1;
       }, 100);
     }
   }

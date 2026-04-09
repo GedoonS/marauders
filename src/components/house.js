@@ -279,6 +279,7 @@ class House {
     for (let i = fromPile.cards.length; i > 0; i--) {
       const card = fromPile.draw();
       card.turn(false);
+      card.isSelected = false;
       toPile.addToBottom(card);
     }
   }

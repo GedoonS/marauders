@@ -71,12 +71,15 @@ function exitFullscreen() {
   }
 }
 
+const buttonAlpha = 0.25;
+const buttonBg = 0xaaffff;
+
 const makeFullScreenButton = (app) => {
   const fullscreenButton = new PIXI.Text({
     text: '⛶',
     style: {
       fontSize: BASEUNIT * 4,
-      fill: 0x999999,
+      fill: 0x000000,
     },
   });
 
@@ -100,6 +103,11 @@ const makeFullScreenButton = (app) => {
     fullscreenButton.text = isFullscreen ? '◱' : '⛶';
   });
 
+  const bg = new PIXI.Graphics().roundRect(fullscreenButton.x, fullscreenButton.y, BASEUNIT * 2, BASEUNIT * 2, BASEUNIT / 2).fill(buttonBg);
+  bg.pivot.set(BASEUNIT, BASEUNIT);
+  bg.alpha = buttonAlpha;
+
+  app.stage.addChild(bg);
   app.stage.addChild(fullscreenButton);
 };
 
@@ -108,12 +116,14 @@ const makeRefreshButton = (app) => {
     text: '╳', //'\u00D7',
     style: {
       fontSize: BASEUNIT * 5,
-      fill: 0x999999,
+      fill: 0x000000,
     },
   });
 
+  const yCorrection = 0.3 * BASEUNIT;
+
   refreshButton.x = WIDTH - BASEUNIT * 4.5;
-  refreshButton.y = HEIGHT - BASEUNIT * 2.3;
+  refreshButton.y = HEIGHT - BASEUNIT * 2 - yCorrection;
   refreshButton.eventMode = 'static';
   refreshButton.cursor = 'pointer';
   refreshButton.scale.set(0.5);
@@ -122,6 +132,13 @@ const makeRefreshButton = (app) => {
     window.location.reload();
   });
 
+  const bg = new PIXI.Graphics()
+    .roundRect(refreshButton.x, refreshButton.y + yCorrection, BASEUNIT * 2, BASEUNIT * 2, BASEUNIT / 2)
+    .fill(buttonBg);
+  bg.pivot.set(BASEUNIT, BASEUNIT);
+  bg.alpha = buttonAlpha;
+
+  app.stage.addChild(bg);
   app.stage.addChild(refreshButton);
 };
 

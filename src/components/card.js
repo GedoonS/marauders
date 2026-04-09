@@ -139,26 +139,22 @@ class Card {
   }
 
   looted() {
-    if (!this.isLoot) return; // Only loot can be looted
+    if (!this.isLoot) return;
     this.isLooted = true;
   }
 
   defeated() {
-    if (!this.isEnemy) return; // Only enemies can be defeated
+    if (!this.isEnemy) return;
 
     this.liveEnemy = false;
     this.rotated = true;
 
     // Flip the Pixi container if it exists
     if (this.container) {
-      //this.container.rotation = Math.PI;
       this.targetRotation = Math.PI;
       this.animateRotation();
       this.setModifierLabel({ show: false });
     }
-
-    // Optionally, you could update the card value logic automatically
-    // but your getValue() already uses liveEnemy/spirit/wrath correctly
   }
 
   getSubtype() {

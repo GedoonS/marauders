@@ -297,7 +297,7 @@ class Table {
     const actions = this.house.getActions();
 
     const buttonWidth = CARDHEIGHT;
-    const buttonHeight = 5.5 * BASEUNIT;
+    const buttonHeight = 5 * BASEUNIT;
     const gap = BASEUNIT;
 
     actions.forEach((actionObj, index) => {

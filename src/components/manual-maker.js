@@ -37,10 +37,8 @@ class ManualMaker {
       })),
     };
 
-    const html = Mustache.render(template, view);
-
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = html;
+    wrapper.innerHTML = Mustache.render(template, view);
     this.container.appendChild(wrapper.firstElementChild);
   }
 

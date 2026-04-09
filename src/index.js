@@ -35,6 +35,54 @@ function drawGrid(app, width, height, unit = BASEUNIT, color = 0xffffff) {
   app.stage.addChild(grid);
 }
 
+function requestFullscreen(element) {
+  // Standard method (modern browsers)
+  if (element.requestFullscreen) {
+    return element.requestFullscreen();
+  }
+  // Firefox (legacy)
+  else if (element.mozRequestFullScreen) {
+    return element.mozRequestFullScreen();
+  }
+  // Chrome, Safari, Opera (legacy)
+  else if (element.webkitRequestFullscreen) {
+    return element.webkitRequestFullscreen();
+  }
+  // IE11 and Edge Legacy
+  else if (element.msRequestFullscreen) {
+    return element.msRequestFullscreen();
+  }
+  // Unsupported browser
+  else {
+    console.error('Fullscreen API not supported in this browser.');
+    return Promise.reject(new Error('Unsupported browser'));
+  }
+}
+
+function exitFullscreen() {
+  // Standard method
+  if (document.exitFullscreen) {
+    return document.exitFullscreen();
+  }
+  // Firefox (legacy)
+  else if (document.mozCancelFullScreen) {
+    return document.mozCancelFullScreen();
+  }
+  // Chrome, Safari, Opera (legacy)
+  else if (document.webkitExitFullscreen) {
+    return document.webkitExitFullscreen();
+  }
+  // IE11 and Edge Legacy
+  else if (document.msExitFullscreen) {
+    return document.msExitFullscreen();
+  }
+  // Unsupported browser
+  else {
+    console.error('Exit fullscreen not supported.');
+    return Promise.reject(new Error('Unsupported browser'));
+  }
+}
+
 async function main() {
   const app = new PIXI.Application();
 
@@ -51,7 +99,7 @@ async function main() {
   document.querySelector('#loading').classList.add('hidden');
 
   document.body.appendChild(app.canvas);
-  const manual = new ManualMaker({ textures: texturePack });
+  const manual = new ManualMaker({ textures: texturePackObject });
   manual.render();
   // drawGrid(app, width, height, BASEUNIT, 0x999999);
   // drawGrid(app, width, height, BASEUNIT * 2, 0xffffff);
@@ -63,6 +111,37 @@ async function main() {
   table.constructTable();
 
   table.render();
+
+  const fullscreenButton = new PIXI.Text({
+    text: '⛶',
+    style: {
+      fontSize: BASEUNIT * 2,
+      fill: 0x999999,
+    },
+  });
+
+  fullscreenButton.x = WIDTH - BASEUNIT * 2;
+  fullscreenButton.y = HEIGHT - BASEUNIT * 2.5;
+  fullscreenButton.eventMode = 'static';
+  fullscreenButton.cursor = 'pointer';
+
+  let isFullscreen = false;
+
+  fullscreenButton.on('pointertap', async () => {
+    try {
+      if (isFullscreen) {
+        await exitFullscreen();
+      } else {
+        await requestFullscreen(document.documentElement);
+      }
+    } catch (err) {
+      console.error('Fullscreen toggle failed:', err);
+    }
+    isFullscreen = !isFullscreen;
+    fullscreenButton.text = isFullscreen ? '↙' : '⛶';
+  });
+
+  app.stage.addChild(fullscreenButton);
 }
 
 main();

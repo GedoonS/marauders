@@ -278,6 +278,7 @@ class House {
     fromPile.shuffle(shuffleTimes);
     for (let i = fromPile.cards.length; i > 0; i--) {
       const card = fromPile.draw();
+      card.turn(false);
       toPile.addToBottom(card);
     }
   }

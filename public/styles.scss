@@ -11,13 +11,16 @@ body {
 }
 
 $aspect-ratio: math.div(420, 240);
+$relative-height: min(100vw / $aspect-ratio, 100vh);
+$relative-width: min(100vh * $aspect-ratio, 100vw);
 canvas {
+  margin-top: calc(50vh - #{$relative-height}/ 2);
   display: block;
   margin-inline: auto;
   aspect-ratio: $aspect-ratio;
   image-rendering: pixelated;
-  width: min(100vh * $aspect-ratio, 100vw);
-  height: min(100vw / $aspect-ratio, 100vh);
+  width: $relative-width;
+  height: $relative-height;
 
   max-width: 100vw;
   max-height: 100vh;

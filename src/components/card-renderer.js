@@ -83,8 +83,11 @@ class CardRenderer {
       cardContainer.y = y;
       card.targetX = x;
       card.targetY = y;
-      card.x = x;
-      card.y = y;
+
+      const containerLocal = this.container.toLocal({ x: card.oldX ?? 0, y: card.oldY ?? 0 });
+      card.x = cardContainer.x = containerLocal.x;
+      card.y = cardContainer.y = containerLocal.y;
+      card.rotation = card.oldRotate - this.container.rotation;
 
       cardContainer.pivot.set(sprite.width / 2, sprite.height / 2);
 
@@ -118,6 +121,8 @@ class CardRenderer {
 
       this.container.addChild(cardContainer);
       card.animateAlpha();
+      card.animateRotation();
+      card.animateMovement();
     } else {
       await this.renderCardBack(card, x, y);
     }
@@ -151,13 +156,16 @@ class CardRenderer {
     const cardContainer = new PIXI.Container();
     cardContainer.x = x;
     cardContainer.y = y;
-    cardContainer.rotation = card.targetRotation;
+    cardContainer.rotation = card.oldRotate || card.targetRotation;
     cardContainer.eventMode = 'passive';
     card.rotation = card.targetRotation;
     card.targetX = x;
     card.targetY = y;
-    card.x = x;
-    card.y = y;
+
+    const containerLocal = this.container.toLocal({ x: card.oldX ?? 0, y: card.oldY ?? 0 });
+
+    card.x = cardContainer.x = containerLocal.x;
+    card.y = cardContainer.y = containerLocal.y;
 
     cardContainer.pivot.set(sprite.width / 2, sprite.height / 2);
     // --- Mask ---
@@ -177,6 +185,7 @@ class CardRenderer {
     // Store reference on the card
     card.backContainer = cardContainer;
     card.animateAlpha();
+    card.animateMovement();
 
     this.container.addChild(cardContainer);
   }

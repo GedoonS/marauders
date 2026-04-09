@@ -1,5 +1,6 @@
 import { Card } from './card.js';
 import { shuffle } from './rng.js';
+import { CARDWIDTH, WIDTH } from './config';
 
 /**
  * Represents a collection of Card objects (deck, hand, discard, etc.)
@@ -53,7 +54,7 @@ class Pile {
    * @param {number|false} index - optional index, defaults to top card
    * @returns {Card|null}
    */
-  draw(index = false) {
+  draw(index = false, spawnCoords = null) {
     let card = null;
     if (typeof index === 'number') {
       if (index < 0 || index >= this.cards.length) return null;
@@ -65,8 +66,23 @@ class Pile {
     if (!card) return null;
 
     // --- Detach from Pixi if rendered ---
-    card.container?.parent.removeChild(card.container);
-    card.backContainer?.parent.removeChild(card.backContainer);
+    if (card.container) {
+      const memoryCoordinates = card.container.getGlobalPosition();
+      card.oldX = memoryCoordinates.x;
+      card.oldY = memoryCoordinates.y;
+      card.oldRotate = card.rotation + card.container.parent.rotation;
+      card.container?.parent.removeChild(card.container);
+    } else if (card.backContainer) {
+      const memoryCoordinates = card.backContainer.getGlobalPosition();
+      card.oldX = memoryCoordinates.x;
+      card.oldY = memoryCoordinates.y;
+      card.oldRotate = card.backContainer.parent.rotation;
+      card.backContainer?.parent.removeChild(card.backContainer);
+    } else {
+      card.oldX = spawnCoords?.x ?? (WIDTH - CARDWIDTH) / 2;
+      card.oldY = spawnCoords?.y ?? 0;
+      card.oldRotate = 0;
+    }
 
     // Optional: reset so renderer knows it must re-render
     card.container = null;

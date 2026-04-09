@@ -194,9 +194,10 @@ class Card {
     if (this.isMoving) return;
 
     this.isMoving = true;
-    const speed = 0.15;
+    let speed = 0.02;
 
     const step = () => {
+      speed *= 1.05;
       const dx = this.targetX - this.x;
       const dy = this.targetY - this.y;
 
@@ -232,7 +233,7 @@ class Card {
     const speed = 0.05; // tweak this
 
     const step = () => {
-      const diff = this.targetRotation - this.rotation;
+      const diff = (this.targetRotation - this.rotation) % Math.PI;
 
       if (Math.abs(diff) < 0.01) {
         this.rotation = this.targetRotation;
@@ -270,7 +271,8 @@ class Card {
    * @param {boolean} [params.show] - Whether the label should be visible
    */
   setModifierLabel({ text, bgColor, show }) {
-    //if (!this.modifierLabel) return;
+    const timeout = Date.now() + 2000;
+    while (!this.modifierLabel && Date.now() < timeout); // Wait till the modifierLabel is present or timeout
     const label = this.modifierLabel;
     if (typeof text === 'string') label.textObj.text = text;
     if (typeof bgColor === 'number') label.bg.tint = bgColor;

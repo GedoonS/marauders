@@ -116,30 +116,30 @@ class House {
    * @param {number} [params.index] - specific index to draw from
    * @param {boolean} [params.faceUp]
    */
-  deal({ fromId, fromPile, toPile, toId, count = 1, index, faceUp }) {
+  deal({ fromId, fromPile, toPile, toId, count = 1, index, faceUp, spawnCoords = null, bottom = false }) {
     const from = fromPile ?? this.getPile(fromId);
     const to = toPile ?? this.getPile(toId);
     if (!from || !to) return;
 
     if (typeof index === 'number') {
-      const card = from.draw(index);
+      const card = from.draw(index, spawnCoords);
 
       if (card) {
         if (typeof faceUp === 'boolean') card.turn(faceUp);
         if (to.maxCards === to.cards.length) to.draw(0);
-        to.add(card);
+        bottom ? to.addToBottom(card) : to.add(card);
       }
 
       return;
     }
 
     for (let i = 0; i < count; i++) {
-      const card = from.draw();
+      const card = from.draw(undefined, spawnCoords);
 
       if (card) {
         if (to.maxCards === to.cards.length) to.draw(0);
         if (typeof faceUp === 'boolean') card.turn(faceUp);
-        to.add(card);
+        bottom ? to.addToBottom(card) : to.add(card);
       }
     }
   }
@@ -379,10 +379,13 @@ class House {
         if (card.isReplenish) {
           const { replenish } = card;
 
+          const spawnCoords = card.container.getGlobalPosition();
           this.deal({
             fromId: replenish.type,
             toId: replenish.to,
             count: replenish.value,
+            bottom: true,
+            spawnCoords,
           });
           this.deal({
             fromPile: wrath,
@@ -400,10 +403,14 @@ class House {
         const card = combat.cards[i];
         if (card?.isReplenish && card?.isSelected) {
           const { replenish } = card;
+
+          const spawnCoords = card.container.getGlobalPosition();
           const deal = {
             fromId: replenish.type,
             toId: replenish.to,
             count: replenish.value,
+            bottom: true,
+            spawnCoords,
           };
           this.deal(deal);
           this.deal({
@@ -483,6 +490,7 @@ class House {
           index: i,
         });
 
+        combatCard.isSelected = false;
         targetPile.slot.toggleSelected(false);
         Object.values(this.piles).forEach((pile) => {
           if (pile.slot?.expectsSelection) pile.slot.toggleExpectsSelection(false);

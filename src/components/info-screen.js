@@ -117,7 +117,7 @@ class InfoScreen {
 
     this.visible = visibility;
 
-    const speed = 0.04;
+    const speed = 0.4;
     const target = this.visible ? 1 : 0;
 
     if (this.visible) {

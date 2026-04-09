@@ -68,6 +68,23 @@ class Table {
 
     this.constructCounters();
 
+    // this.addSlot({
+    //   id: 'discardStamina',
+    //   pile: this.house.piles.discardStamina,
+    //   x: WIDTH / 2,
+    //   y: -CARDHEIGHT,
+    //   width: CARDWIDTH,
+    //   height: CARDHEIGHT,
+    // });
+    // this.addSlot({
+    //   id: 'discardFate',
+    //   pile: this.house.piles.discardFate,
+    //   x: WIDTH / 2,
+    //   y: -CARDHEIGHT,
+    //   width: CARDWIDTH,
+    //   height: CARDHEIGHT,
+    // });
+
     this.addSlot({
       id: 'wrath',
       pile: this.house.piles.wrath,
@@ -75,7 +92,6 @@ class Table {
       y: BASEUNIT,
       width: CARDWIDTH,
       height: CARDHEIGHT,
-      //layout: 'evenodd',
     });
 
     this.addSlot({

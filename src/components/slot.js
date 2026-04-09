@@ -126,6 +126,8 @@ class Slot {
       const cardOffset = this.getCardPosition(index, cardSpacing);
 
       await this.cardRenderer.render(card, cardOffset, this.snaking ? (Math.sin(index) * BASEUNIT) / 2 : 0);
+
+      this.container.setChildIndex(card.container ?? card.backContainer, index);
       index++;
     }
     this.renderSum();
@@ -192,14 +194,23 @@ class Slot {
   toggleSelected(state = undefined) {
     this.isSelected = state ?? !this.isSelected;
     //if (this.isSelected) this.toggleExpectsSelection(false);
-    setTimeout(() => {
-      this.outline.alpha = this.isSelected ? 1 : 0.1;
-    }, 100);
+    if (this.outline) {
+      setTimeout(() => {
+        this.outline.alpha = this.isSelected ? 1 : 0.1;
+      }, 100);
+    }
   }
 
   toggleExpectsSelection(state = undefined) {
     this.expectsSelection = state ?? !this.isSelected;
-    //this.outline.alpha = this.isSelected ? 1 : 0.5;
+
+    if (this.expectsSelection) {
+      this.oldChildIndex = this.container.parent.getChildIndex(this.container);
+      const highestChildIndex = Math.max(...this.container.parent.children.map((c) => this.container.parent.getChildIndex(c)));
+      this.container.parent.setChildIndex(this.container, highestChildIndex);
+    } else if (this.oldChildIndex) {
+      this.container.parent.setChildIndex(this.container, this.oldChildIndex);
+    }
 
     if (this.expectsSelection) {
       this.startAlphaPulse();

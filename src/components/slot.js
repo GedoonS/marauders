@@ -48,6 +48,7 @@ class Slot {
     maxCards = -1,
     snaking,
     defaultCardsLength,
+    outline,
   }) {
     this.id = id;
     this.x = x;
@@ -63,6 +64,7 @@ class Slot {
     this.subtypeAllowed = subtypeAllowed;
     this.maxCards = maxCards;
     this.snaking = snaking;
+    this.outlineShow = outline;
     if (defaultCardsLength) this.maxCardsInPile = defaultCardsLength;
 
     this.pile.setParentSlot(this);
@@ -85,26 +87,28 @@ class Slot {
     this.parentContainer.addChild(this.container);
     this.initStatusText();
 
-    this.outline = new PIXI.Graphics()
-      .roundRect(-2, -2, this.width + 4, this.height + 4, BASEUNIT)
-      .fill(0x010101)
-      .stroke({ width: 2, color: 0xffffff });
-    this.outline.x = -CARDWIDTH / 2;
-    this.outline.y = -CARDHEIGHT / 2;
-    this.outline.alpha = 0.1;
+    if (this.outlineShow) {
+      this.outline = new PIXI.Graphics()
+        .roundRect(-2, -2, this.width + 4, this.height + 4, BASEUNIT)
+        .fill(0x010101)
+        .stroke({ width: 2, color: 0xffffff });
+      this.outline.x = -CARDWIDTH / 2;
+      this.outline.y = -CARDHEIGHT / 2;
+      this.outline.alpha = 0.1;
 
-    if (selectables.includes(this.id)) {
-      this.outline.eventMode = 'static';
-      this.outline.cursor = 'pointer';
-      this.outline.on('pointerdown', () => {
-        if (this.expectsSelection) {
-          this.table.unselectSlots(this);
-          this.toggleSelected();
-        }
-      });
+      if (selectables.includes(this.id)) {
+        this.outline.eventMode = 'static';
+        this.outline.cursor = 'pointer';
+        this.outline.on('pointerdown', () => {
+          if (this.expectsSelection) {
+            this.table.unselectSlots(this);
+            this.toggleSelected();
+          }
+        });
+      }
+
+      this.container.addChild(this.outline);
     }
-
-    this.container.addChild(this.outline);
 
     this.cardRenderer = new CardRenderer({
       container: this.container,

@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { Slot } from './slot';
-import { BASEUNIT, CARDHEIGHT, WIDTH, HEIGHT, AAA_SCALING, FONT_FAMILY, PILE_TYPE_MAP, CARDWIDTH } from './config';
+import { BASEUNIT, CARDHEIGHT, CARDWIDTH, WIDTH, AAA_SCALING, FONT_FAMILY, PILE_TYPE_MAP } from './config';
 import { InfoScreen } from './info-screen';
 
 const infoScreenVisibleStates = ['start', 'victory', 'exhausted', 'defeated'];
@@ -129,24 +129,26 @@ class Table {
       pile: this.house.piles.trinketLeft,
       x: centerColumnLeftSide,
       y: topAreaHeight + 2 * BASEUNIT,
-      width: CARDHEIGHT / 2 - BASEUNIT,
+      width: CARDWIDTH,
       height: CARDHEIGHT,
       rotate: true,
       subtypeAllowed: PILE_TYPE_MAP['trinketLeft'],
       maxCards: 1,
+      outline: true,
     });
 
     this.addSlot({
       id: 'gearLeftHand',
       pile: this.house.piles.gearLeftHand,
-      x: centerColumnLeftSide,
-      y: topAreaHeight + CARDHEIGHT / 2 + BASEUNIT,
-      width: CARDHEIGHT / 2 + BASEUNIT,
+      x: centerColumnLeftSide + BASEUNIT / 2,
+      y: topAreaHeight + CARDHEIGHT / 2,
+      width: CARDWIDTH,
       height: CARDHEIGHT,
       rotate: true,
       subtypeAllowed: 'hand',
       subtypeAllowed: PILE_TYPE_MAP['gearLeftHand'],
       maxCards: 1,
+      outline: true,
     });
 
     this.addSlot({
@@ -154,23 +156,25 @@ class Table {
       pile: this.house.piles.gearHead,
       x: (WIDTH - CARDHEIGHT) / 2,
       y: topAreaHeight + BASEUNIT * 2,
-      width: CARDHEIGHT / 2 - BASEUNIT,
+      width: CARDWIDTH,
       height: CARDHEIGHT,
       rotate: true,
       subtypeAllowed: PILE_TYPE_MAP['gearHead'],
       maxCards: 1,
+      outline: true,
     });
 
     this.addSlot({
       id: 'gearBody',
       pile: this.house.piles.gearBody,
-      x: (WIDTH - CARDHEIGHT) / 2,
-      y: topAreaHeight + CARDHEIGHT / 2 + BASEUNIT,
-      width: CARDHEIGHT / 2 + BASEUNIT,
+      x: (WIDTH - CARDHEIGHT) / 2 + BASEUNIT / 2,
+      y: topAreaHeight + CARDHEIGHT / 2,
+      width: CARDWIDTH,
       height: CARDHEIGHT,
       rotate: true,
       subtypeAllowed: PILE_TYPE_MAP['gearBody'],
       maxCards: 1,
+      outline: true,
     });
 
     this.addSlot({
@@ -178,23 +182,25 @@ class Table {
       pile: this.house.piles.trinketRight,
       x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT,
       y: topAreaHeight + BASEUNIT * 2,
-      width: CARDHEIGHT / 2 - BASEUNIT,
+      width: CARDWIDTH,
       height: CARDHEIGHT,
       rotate: true,
       subtypeAllowed: PILE_TYPE_MAP['trinketRight'],
       maxCards: 1,
+      outline: true,
     });
 
     this.addSlot({
       id: 'gearRightHand',
       pile: this.house.piles.gearRightHand,
-      x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT,
-      y: topAreaHeight + CARDHEIGHT / 2 + BASEUNIT,
-      width: CARDHEIGHT / 2 + BASEUNIT,
+      x: centerColumnLeftSide + centerColumnWidth - CARDHEIGHT + BASEUNIT / 2,
+      y: topAreaHeight + CARDHEIGHT / 2,
+      width: CARDWIDTH,
       height: CARDHEIGHT,
       rotate: true,
       subtypeAllowed: PILE_TYPE_MAP['gearRightHand'],
       maxCards: 1,
+      outline: true,
     });
 
     this.infoScreen = new InfoScreen({

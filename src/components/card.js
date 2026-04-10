@@ -191,13 +191,13 @@ class Card {
    * Animate movement of the card towards targetX / targetY
    */
   animateMovement() {
-    let speed = 0.02;
+    this.animationSpeed = 0.02;
     if (this.isMoving) return;
 
     this.isMoving = true;
 
     const step = ({ deltaTime }) => {
-      speed *= 1 + deltaTime / 10;
+      this.animationSpeed *= 1 + deltaTime / 10;
       const dx = this.targetX - this.x;
       const dy = this.targetY - this.y;
 
@@ -208,8 +208,8 @@ class Card {
         this.ticker.remove(step);
         this.isMoving = false;
       } else {
-        this.x += dx * speed;
-        this.y += dy * speed;
+        this.x += dx * this.animationSpeed;
+        this.y += dy * this.animationSpeed;
       }
 
       if (this.container) {

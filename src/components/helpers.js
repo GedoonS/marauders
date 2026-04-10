@@ -71,10 +71,28 @@ function exitFullscreen() {
   }
 }
 
+function iOS() {
+  return (
+    [
+      // iDevices
+      'iPad Simulator',
+      'iPhone Simulator',
+      'iPod Simulator',
+      'iPad',
+      'iPhone',
+      'iPod',
+    ].includes(navigator.platform) ||
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
+  );
+}
+
 const buttonAlpha = 0.25;
 const buttonBg = 0xaaffff;
 
 const makeFullScreenButton = (app) => {
+  if (iOS()) return;
+
   const fullscreenButton = new PIXI.Text({
     text: '⛶',
     style: {
@@ -83,7 +101,7 @@ const makeFullScreenButton = (app) => {
     },
   });
 
-  fullscreenButton.x = WIDTH - BASEUNIT * 2;
+  fullscreenButton.x = WIDTH - BASEUNIT * 4.5;
   fullscreenButton.y = HEIGHT - BASEUNIT * 2;
   fullscreenButton.eventMode = 'static';
   fullscreenButton.cursor = 'pointer';
@@ -93,15 +111,21 @@ const makeFullScreenButton = (app) => {
 
   let isFullscreen = false;
 
+  const updateButton = () => {
+    isFullscreen = !!document.fullscreenElement;
+    fullscreenButton.text = isFullscreen ? '◱' : '⛶';
+  };
+
   fullscreenButton.on('pointertap', async () => {
     try {
       isFullscreen ? await exitFullscreen() : await requestFullscreen(document.documentElement);
     } catch (err) {
       console.error('Fullscreen toggle failed:', err);
     }
-    isFullscreen = !isFullscreen;
-    fullscreenButton.text = isFullscreen ? '◱' : '⛶';
+    updateButton();
   });
+
+  document.addEventListener('fullscreenchange', updateButton);
 
   const bg = new PIXI.Graphics().roundRect(fullscreenButton.x, fullscreenButton.y, BASEUNIT * 2, BASEUNIT * 2, BASEUNIT / 2).fill(buttonBg);
   bg.pivot.set(BASEUNIT, BASEUNIT);
@@ -120,9 +144,9 @@ const makeRefreshButton = (app) => {
     },
   });
 
-  const yCorrection = 0.3 * BASEUNIT;
+  const yCorrection = iOS() ? 0 : 0.3 * BASEUNIT;
 
-  refreshButton.x = WIDTH - BASEUNIT * 4.5;
+  refreshButton.x = WIDTH - BASEUNIT * 2;
   refreshButton.y = HEIGHT - BASEUNIT * 2 - yCorrection;
   refreshButton.eventMode = 'static';
   refreshButton.cursor = 'pointer';
